@@ -15,18 +15,10 @@ def generate_extended_leafs():
     leafs = get_leafs()
     extended_leafs = []
     for name, cls in leafs:
-        new_school_expansion = f'class {name}NewSchool({name}):\n    pass'
-        old_school_expansion = f'class {name}OldSchool({name}):\n    pass'
-        with_lyrics_new_school_expansion = f'class {name}NewSchoolWithLyrics({name}NewSchool):\n    pass'
-        with_lyrics_old_school_expansion = f'class {name}OldSchoolWithLyrics({name}OldSchool):\n    pass'
-        beats_new_school_expansion = f'class {name}NewSchoolBeats({name}NewSchool):\n    pass'
-        beats_old_school_expansion = f'class {name}OldSchoolBeats({name}OldSchool):\n    pass'
-        extended_leafs.append(new_school_expansion)
-        extended_leafs.append(old_school_expansion)
-        extended_leafs.append(with_lyrics_new_school_expansion)
-        extended_leafs.append(with_lyrics_old_school_expansion)
-        extended_leafs.append(beats_new_school_expansion)
-        extended_leafs.append(beats_old_school_expansion)
+        vocal_expansion = f'class {name}Vocal({name}):\n    pass'
+        beat_expansion = f'class {name}Beat({name}):\n    pass'
+        extended_leafs.append(vocal_expansion)
+        extended_leafs.append(beat_expansion)
     return extended_leafs
 
 
