@@ -45,30 +45,38 @@ class HipHop:
         self.solo_duet_group: enum.Enum  # категорийный
 
 
-class OldSchool(HipHop):
+class BattleRap(HipHop):
     pass
 
 
-class OldSchoolSecondLevelPlaceholder(OldSchool):
+class Classic(BattleRap):
     pass
 
 
-class Gangsta(OldSchoolSecondLevelPlaceholder):
+class Freestyle(BattleRap):
+    pass
+
+
+class HipHopMusic(HipHop):
+    pass
+
+
+class OldSchool(HipHopMusic):
+    pass
+
+
+class Gangsta(OldSchool):
     """
     Cтиль хип-хопа, характеризующийся темами и текстами, которые обычно подчёркивают стиль жизни «гангстера».
     """
     pass
 
 
-class Lyrics(OldSchoolSecondLevelPlaceholder):
+class Lyrics(OldSchool):
     pass
 
 
-class NewSchool(HipHop):
-    pass
-
-
-class SecondLevelPlaceholder(NewSchool):
+class NewSchool(HipHopMusic):
     pass
 
 
@@ -208,7 +216,7 @@ class RapRock(Alternative):
     pass
 
 
-class Hookah(SecondLevelPlaceholder):
+class Hookah(NewSchool):
     """
     * В музыке также характерно использование традиционных хип-хоповых битов. В ряде треков, тем не менее,
     используется прямая бочка.
@@ -221,7 +229,7 @@ class Hookah(SecondLevelPlaceholder):
     pass
 
 
-class Pop(SecondLevelPlaceholder):
+class Pop(NewSchool):
     """
     Поп-рэп — гибрид хип-хопа с массивным мелодичным заполнением, который традиционно является частью хоровой секции
     в структуре обычной поп-композиции[4]. Поп-рэп имеет тенденцию к понижению злости и увеличению лирической ценности
@@ -230,5 +238,5 @@ class Pop(SecondLevelPlaceholder):
     pass
 
 
-class Underground(SecondLevelPlaceholder):
+class Underground(NewSchool):
     pass
