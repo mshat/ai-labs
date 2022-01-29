@@ -49,7 +49,7 @@ class BattleRap(HipHop):
     pass
 
 
-class Classic(BattleRap):
+class Regular(BattleRap):
     pass
 
 
@@ -65,14 +65,30 @@ class OldSchool(HipHopMusic):
     pass
 
 
-class Gangsta(OldSchool):
+class OldSchoolHardcore(OldSchool):
+    pass
+
+
+class WorkOut(OldSchoolHardcore):
+    pass
+
+
+class Gangsta(OldSchoolHardcore):
     """
     Cтиль хип-хопа, характеризующийся темами и текстами, которые обычно подчёркивают стиль жизни «гангстера».
     """
     pass
 
 
-class Lyrics(OldSchool):
+class RussianRap(OldSchool):
+    pass
+
+
+class Classic(RussianRap):
+    pass
+
+
+class Soft(RussianRap):
     pass
 
 

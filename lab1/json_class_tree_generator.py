@@ -21,7 +21,7 @@ def generate_dict_tree_form_classes(cls, classes):
 
 
 def generate_json_class_tree():
-    classes = get_module_classes("genres")
+    classes = get_module_classes("genres.genres")
     root_cls = classes['HipHop']
     dict_tree = generate_dict_tree_form_classes(root_cls, classes)
     with open('genres.json', 'w') as file:
