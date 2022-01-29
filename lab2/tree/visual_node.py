@@ -1,6 +1,6 @@
 import graphviz
 import string
-from .tree import Node
+from .node import Node
 
 
 def infinite_sequence():

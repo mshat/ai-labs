@@ -1,4 +1,4 @@
-from .tree import Node
+from .node import Node
 
 
 def find_path_to_node(root: Node, path, node_name):
