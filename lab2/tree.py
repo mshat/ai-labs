@@ -1,7 +1,7 @@
 class Node:
     def __init__(self, val: int = 0, children: list = None):
         self.value = val
-        self.children = children
+        self.children = children if children else []
 
     @property
     def values_str(self):
