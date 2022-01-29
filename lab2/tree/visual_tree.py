@@ -1,6 +1,6 @@
 import graphviz
 import string
-from tree import Node
+from .tree import Node
 
 
 def infinite_sequence():
@@ -23,8 +23,15 @@ class VisualNode(Node):
         self.dot.node(self.dot_name, self.values_str)
         if self.children:
             for child in self.children:
-                self.dot.edges([f'{self.dot_name}{child.dot_name}'])
+                self._add_edge(child)
+
+    def _add_edge(self, child):
+        self.dot.edges([f'{self.dot_name}{child.dot_name}'])
 
     def render_tree(self):
         self.dot.render(directory='doctest-output')
+
+    def add_child(self, node):
+        super(VisualNode, self).add_child(node)
+        self._add_edge(node)
 

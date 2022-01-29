@@ -1,10 +1,12 @@
-from visual_tree import VisualNode
+from tree.visual_tree import VisualNode
+from tree.tree_tools import calc_distance_between_nodes
+from tree.tree_loader import load_tree_dict, create_tree_from_json
 
 
 if __name__ == '__main__':
-    node1 = VisualNode(1, [VisualNode(4), VisualNode(5)])
-    node2 = VisualNode(2, [VisualNode(6), VisualNode(7)])
-    node3 = VisualNode(3, [VisualNode(8), VisualNode(9)])
-    root = VisualNode(0, [node1, node2])
-
-    root.render_tree()
+    tree = create_tree_from_json('genres.json')
+    # tree.render_tree()
+    # VisualNode.show_tree(tree)
+    print(calc_distance_between_nodes(tree, 'Rapcore', 'Emo'))
+    print(calc_distance_between_nodes(tree, 'RapRock', 'Emo'))
+    print(calc_distance_between_nodes(tree, 'Classic', 'Emo'))
