@@ -113,7 +113,7 @@ class Club(ElectronicHipHop):
     pass
 
 
-class Trap(ElectronicHipHop):
+class ElectronicVocal(ElectronicHipHop):
     """
     Поджанр хип-хопа
     В музыке широко используются многослойные синтезаторы, на которых ведётся мелодия с жёсткой линией;
