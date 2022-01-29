@@ -216,7 +216,11 @@ class RapRock(Alternative):
     pass
 
 
-class Hookah(NewSchool):
+class Popular(NewSchool):
+    pass
+
+
+class Hookah(Popular):
     """
     * В музыке также характерно использование традиционных хип-хоповых битов. В ряде треков, тем не менее,
     используется прямая бочка.
@@ -229,7 +233,7 @@ class Hookah(NewSchool):
     pass
 
 
-class Pop(NewSchool):
+class Pop(Popular):
     """
     Поп-рэп — гибрид хип-хопа с массивным мелодичным заполнением, который традиционно является частью хоровой секции
     в структуре обычной поп-композиции[4]. Поп-рэп имеет тенденцию к понижению злости и увеличению лирической ценности
@@ -238,5 +242,5 @@ class Pop(NewSchool):
     pass
 
 
-class Underground(NewSchool):
+class Underground(Hardcore):
     pass
