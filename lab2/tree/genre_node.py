@@ -1,21 +1,21 @@
 from .visual_node import VisualNode
-
-ARTISTS = ['name1', 'name2', 'name3']
-NATIONALITIES = ['n1', 'n2', 'n3']
+import sys
+sys.path.append("..")
+from artists import ARTISTS, THEMES
 
 
 class GenreVisualNode(VisualNode):
-    def __init__(self, name, year_of_birth, group_members_num, nationality, is_male=True, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, genre, name, year_of_birth, group_members_num, theme, is_male=True, *args, **kwargs):
+        self.genre = genre
         self.male_or_female = 1 if is_male else 0
         self.name = name
-        assert name in ARTISTS
-        self.nationality = nationality
+        self.theme = theme
         self.year_of_birth = year_of_birth
         self.group_members_number = group_members_num
+        super().__init__(val=name, *args, **kwargs)
 
     @property
-    def solo_duet_group(self):  # категорийный
+    def solo_duet_group(self) -> str:  # категорийный
         if self.group_members_number == 1:
             return 'solo'
         elif self.group_members_number == 2:
@@ -26,7 +26,34 @@ class GenreVisualNode(VisualNode):
             raise ValueError('Group_members_number must be > 0')
 
     @property
-    def attributes(self) -> list:
+    def values_str(self):
+        attributes = []
+        attributes.append(self.genre.upper())
+        male_female = 'male' if self.male_or_female == 1 else 'female'
+        attributes.append(male_female)
+        attributes.append(self.name)
+        attributes.append(self.theme)
+        attributes.append(str(self.year_of_birth))
+        attributes.append(self.solo_duet_group)
+        return ' '.join(attributes)
+
+
+    @property
+    def countable_attributes(self) -> list:
         attributes = []
         male_female = (self.male_or_female + 1) / 2
         attributes.append(male_female)
+        assert self.name in ARTISTS
+        name_coeff = ARTISTS.index(self.name) / len(ARTISTS)
+        attributes.append(name_coeff)
+        assert self.theme in THEMES
+        theme_coeff = THEMES.index(self.theme) / len(THEMES)
+        attributes.append(theme_coeff)
+        attributes.append(self.year_of_birth / 10000)
+        if self.group_members_number > 2:
+            solo_duet_group_coeff = 3
+        else:
+            solo_duet_group_coeff = self.group_members_number
+        solo_duet_group_coeff = solo_duet_group_coeff / 3
+        attributes.append(solo_duet_group_coeff)
+        return attributes

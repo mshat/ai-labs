@@ -6,9 +6,21 @@ class Node:
     def add_child(self, node):
         self.children.append(node)
 
+
     @property
     def values_str(self):
         return str(self.value)
+
+    @staticmethod
+    def get_child_by_name(root, name):
+        if root.value == name:
+            return root
+        if not root.children:
+            return
+        for child in root.children:
+            res = Node.get_child_by_name(child, name)
+            if res:
+                return res
 
     @staticmethod
     def show_tree(root, spaces_num: int = 0):
