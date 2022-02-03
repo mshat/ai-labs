@@ -37,23 +37,23 @@ class GenreVisualNode(VisualNode):
         attributes.append(self.solo_duet_group)
         return ' '.join(attributes)
 
-
     @property
-    def countable_attributes(self) -> list:
-        attributes = []
+    def countable_attributes(self) -> dict:
+        attributes = {}
         male_female = (self.male_or_female + 1) / 2
-        attributes.append(male_female)
+        attributes.update({'male_female': male_female})
         assert self.name in ARTISTS
-        name_coeff = ARTISTS.index(self.name) / len(ARTISTS)
-        attributes.append(name_coeff)
+        name = ARTISTS.index(self.name) / len(ARTISTS)
+        attributes.update({'name': name})
         assert self.theme in THEMES
-        theme_coeff = THEMES.index(self.theme) / len(THEMES)
-        attributes.append(theme_coeff)
-        attributes.append(self.year_of_birth / 10000)
+        theme = THEMES.index(self.theme) / len(THEMES)
+        attributes.update({'theme': theme})
+        year_of_birth = self.year_of_birth / 10000
+        attributes.update({'year_of_birth': year_of_birth})
         if self.group_members_number > 2:
-            solo_duet_group_coeff = 3
+            solo_duet_group = 3
         else:
-            solo_duet_group_coeff = self.group_members_number
-        solo_duet_group_coeff = solo_duet_group_coeff / 3
-        attributes.append(solo_duet_group_coeff)
+            solo_duet_group = self.group_members_number
+        solo_duet_group = solo_duet_group / 3
+        attributes.update({'solo_duet_group': solo_duet_group})
         return attributes
