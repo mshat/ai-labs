@@ -4,7 +4,7 @@ from proximity_measures import calc_tree_distance_measure
 from tools import format_print
 
 
-def compare_measures(tree, artist_pairs):
+def compare_measures(tree, artist_pairs, max_general_proximity: float = None):
     euclidean_proximity = []
     manhattan_proximity = []
     tree_distance_proximity = []
@@ -19,7 +19,9 @@ def compare_measures(tree, artist_pairs):
         euclidean_proximity.append(calc_euclidean_measure(artist1, artist2))
         manhattan_proximity.append(calc_manhattan_measure(artist1, artist2))
         tree_distance_proximity.append(calc_tree_distance_measure(tree, artist1, artist2, max_distance_between_artists))
-        generalizing_proximity.append(generalizing_proximity_measure(tree, artist1, artist2, max_distance_between_artists))
+        generalizing_proximity.append(
+            generalizing_proximity_measure(tree, artist1, artist2, max_distance_between_artists, max_general_proximity)
+        )
 
     artist_names = [(artist1.name + ' - ' + artist2.name) for artist1, artist2 in artist_pairs]
     format_print(['artists', 'generalizing', 'euclidean', 'manhattan', 'tree distance'], [25, 15])
