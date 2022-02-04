@@ -42,6 +42,9 @@ class GenreVisualNode(VisualNode):
         attributes = {}
         male_female = (self.male_or_female + 1) / 2
         attributes.update({'male_female': male_female})
+        if self.name not in ARTISTS:
+            print(self.name)
+            print(ARTISTS)
         assert self.name in ARTISTS
         name = ARTISTS.index(self.name) / len(ARTISTS)
         attributes.update({'name': name})

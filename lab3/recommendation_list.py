@@ -67,7 +67,7 @@ def show_recommendations(
 
 def main():
     tree = create_tree_from_json('data/genres.json')
-    # create_artist_pairs_proximity_json(tree)
+    create_artist_pairs_proximity_json(tree)
     artist_pairs_proximity = load_artist_pairs_proximity_json()
     max_general_proximity = calc_max_general_proximity(artist_pairs_proximity)
     min_general_proximity = calc_min_general_proximity(artist_pairs_proximity)
@@ -80,7 +80,7 @@ def main():
     #     values += list(pair.values())
     # print('SORTED PROXIMITIES', sorted(values))
 
-    # print_all_artist_pairs_proximity(artist_pairs_proximity)
+    print_all_artist_pairs_proximity(artist_pairs_proximity)
 
     ## ноды для мер близости
     atl = Node.get_child_by_name(tree, 'atl')

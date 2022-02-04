@@ -1,3 +1,4 @@
+import random
 from collections import OrderedDict
 from recommendation_list import show_recommendations, get_recommendations
 from recommendation_list import (
@@ -35,26 +36,110 @@ def split_artists(artists: str):
     return res
 
 
-def recommend_by_seem(seed_artist: str, max_output_len=5):
+def recommend_by_seed(seed_artist: str, max_output_len=5):
     seed = find_artist(seed_artist)
 
     show_recommendations(seed, ARTIST_PAIRS_PROXIMITY, max_len=max_output_len)
 
 
-def recommend_by_liked(liked_artist_names: str, max_output_len=5):
+def recommend_by_liked(liked_artist_names: str, max_output_len=5, show=True):
     liked_artist_names_list = split_artists(liked_artist_names)
     liked_artists = {find_artist(artist.lower()) for artist in liked_artist_names_list}
 
-    artist_recommendations = []
+    artist_recommendations = OrderedDict()
     for artist in liked_artists:
-        artist_recommendations.append(get_recommendations(
+        recommendations = get_recommendations(
             artist,
-            ARTIST_PAIRS_PROXIMITY,
-            max_output_len // len(liked_artists) + 1
-        ))
+            ARTIST_PAIRS_PROXIMITY
+        )
+        artist_recommendations[artist.name] = recommendations
 
-    for recommendation in artist_recommendations:
-        print(recommendation)
+    final_recommendations = {}
+    max_artists_recommendations_len = max_output_len // len(liked_artists)
+    max_artists_recommendations_len += 1 if max_output_len % len(liked_artists) != 0 else 0
+    for artist, recommendations in artist_recommendations.items():
+        i = 0
+        for name, proximity in recommendations.items():
+            if i >= max_artists_recommendations_len:
+                break
+            if name not in final_recommendations:
+                final_recommendations[name] = proximity
+                i += 1
+
+    final_recommendation_artists = list(final_recommendations.keys())
+    random.shuffle(final_recommendation_artists)
+    for i, artist_name in enumerate(final_recommendation_artists):
+        if i < max_output_len:
+            # print(artist_name, final_recommendations[artist_name])
+            if show:
+                print(artist_name)
+    return final_recommendation_artists
+
+
+def check_artist_like_dislike(artist, dislikes, debug=True) -> bool:
+    for dislike in dislikes:
+        artist_dislike_proximity = generalizing_proximity_measure(TREE, artist, dislike, max_distance_between_nodes, min_proximity, max_proximity)
+        if artist_dislike_proximity < 0.49:
+            if debug:
+                print(f'[DEBUG] {artist} похож на {dislike}: {artist_dislike_proximity}')
+            return False
+    return True
+
+
+def recommend_by_disliked(disliked_artists: str, liked_artist_names: str, max_output_len=5, debug=True):
+    liked_artist_names_list = split_artists(liked_artist_names)
+    liked_artists = {find_artist(artist.lower()) for artist in liked_artist_names_list}
+
+    artist_recommendations = OrderedDict()
+    for artist in liked_artists:
+        recommendations = get_recommendations(
+            artist,
+            ARTIST_PAIRS_PROXIMITY
+        )
+        artist_recommendations[artist.name] = recommendations
+
+    disliked_artist_names_list = split_artists(disliked_artists)
+    disliked_artists = {find_artist(artist.lower()) for artist in disliked_artist_names_list}
+    #print(disliked_artists)
+
+    final_recommendations = {}
+    max_artists_recommendations_len = max_output_len // len(liked_artists)
+    max_artists_recommendations_len += 1 if max_output_len % len(liked_artists) != 0 else 0
+    for artist, recommendations in artist_recommendations.items():
+        i = 0
+        for name, proximity in recommendations.items():
+            if i >= max_artists_recommendations_len:
+                break
+            recommended_artist = find_artist(name.lower())
+            if name not in final_recommendations:
+                if check_artist_like_dislike(recommended_artist, disliked_artists, debug):
+                    final_recommendations[name] = proximity
+                    i += 1
+
+    for i, artist_name in enumerate(final_recommendations):
+        if i < max_output_len:
+            # print(artist_name, final_recommendations[artist_name])
+            if artist_name not in disliked_artist_names_list:
+                print(artist_name)
+            else:
+                if debug:
+                    print(f'[DEBUG] Не выводим {artist_name}, тк он дизлайкнут')
+
+
+def recommend_by_disliked2(disliked_artists: str, liked_artist_names: str, max_output_len=5, debug=True):
+    disliked_artist_names_list = split_artists(disliked_artists)
+    disliked_artists = {find_artist(artist.lower()) for artist in disliked_artist_names_list}
+    #print(disliked_artists)
+    final_recommendation_artists = recommend_by_liked(liked_artist_names, max_output_len, show=False)
+    #print(res)
+    for i, artist_name in enumerate(final_recommendation_artists):
+        if i < max_output_len:
+            # print(artist_name, final_recommendations[artist_name])
+            if artist_name not in disliked_artist_names_list:
+                print(artist_name)
+            else:
+                if debug:
+                    print(f'[DEBUG] Не выводим {artist_name}, тк он дизлайкнут')
 
 
 def recommend_by_liked_old(liked_artist_names: str, max_output_len=5):
@@ -97,5 +182,4 @@ def recommend_by_liked_old(liked_artist_names: str, max_output_len=5):
         print(recommended_artist, proximity)
 
 
-def recommend_by_disliked(disliked_artists: str, max_output_len=5):
-    print(disliked_artists)
+

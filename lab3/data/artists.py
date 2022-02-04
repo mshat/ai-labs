@@ -18,10 +18,10 @@ ARTISTS = [
     'Полумягкие', 'ОУ74', 'Паша Техник', 'Овсянкин',  # underground
     'PHARAOH', 'Boulevard Depo', 'Mnogoznaal', 'Kizaru',  # cloud
     'ЛСП', 'ATL', 'Макс Корж', 'Slava Marlow',  # electro vocal
-    'Скриптонит', 'Noize MC', 'Loqiemean', '25/17', 'Anacondaz',  # RapRock
-    'LIZER', 'Джизус', 'МУККА', 'LIDA',  # emo
+    'Скриптонит', 'Noize MC', 'Loqiemean', 'anacondaz', '25/17',  # RapRock
+    'LIZER', 'Джизус', 'МУККА', 'lizer', # emo
     'Face', 'GONE.Fludd', 'Big Baby Tape', 'Элджей', 'Morgenshtern',  # mumble
-    'Rakhim', 'Егор Крид', 'Тимати', 'Pyrokinesis', 'ST', 'T-Fest',  # pop
+    'Rakhim', 'Егор Крид', 'Тимати', 'Pyrokinesis', 'T-Fest',  # pop
     'MiyaGi', 'Jah Khalib', 'HammAli & Navai'  # hookah
 ]
 

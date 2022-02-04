@@ -20,6 +20,18 @@
         }
     },
     "raprock": {
+        "25/17": {
+            "year_of_birth": 1987,
+            "group_members_num": 2,
+            "theme": "art",
+            "is_male": true
+        },
+        "anacondaz": {
+            "year_of_birth": 1987,
+            "group_members_num": 5,
+            "theme": "fun",
+            "is_male": true
+        },
         "скриптонит": {
             "year_of_birth": 1990,
             "group_members_num": 4,
