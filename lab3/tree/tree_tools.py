@@ -51,7 +51,18 @@ def calc_distance_between_all_nodes(tree: Node, leafs: list):
     return distances_between_nodes
 
 
-def calc_max_distance_between_nodes(distances_between_nodes: dict):
+def calc_max_distance_between_nodes(tree: Node):
+    leafs = []
+    get_leafs(tree, leafs)
+    distances_between_nodes = calc_distance_between_all_nodes(tree, leafs)
+    max_distance = 0
+    for pair_name, pair_data in distances_between_nodes.items():
+        if pair_data['distance'] > max_distance:
+            max_distance = pair_data['distance']
+    return max_distance
+
+
+def calc_max_distance_between_nodes_optimized(distances_between_nodes: dict):
     max_distance = 0
     for pair_name, pair_data in distances_between_nodes.items():
         if pair_data['distance'] > max_distance:

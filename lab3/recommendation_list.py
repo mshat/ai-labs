@@ -1,11 +1,16 @@
 import json
 from collections import OrderedDict
-from tree.visual_node import VisualNode, Node
-from tree.tree_tools import calc_distance_between_nodes, get_leafs, find_path_to_node, calc_max_distance_between_nodes, calc_distance_between_all_nodes
-from tree.tree_loader import load_tree_dict, create_tree_from_json, get_artists
+from tree.visual_node import Node
+from tree.tree_tools import calc_max_distance_between_nodes
+from tree.tree_loader import create_tree_from_json
 from tree.genre_node import GenreVisualNode
-from proximity_measures import calc_euclidean_measure, calc_manhattan_measure, generalizing_proximity_measure, calc_tree_distance_measure
-from proximity_measures import calc_generalizing_proximity_measure_for_all_leafs, calc_max_general_proximity, normalize_proximities
+from proximity_measures import generalizing_proximity_measure
+from proximity_measures import (
+    calc_generalizing_proximity_measure_for_all_leafs,
+    calc_max_general_proximity,
+    calc_min_general_proximity,
+    normalize_proximities
+)
 from tools import format_print
 from compare_measures import compare_measures
 
@@ -17,7 +22,7 @@ def create_artist_pairs_proximity_json(tree):
         json.dump(artist_pairs_proximity, file)
 
 
-def load_artist_pairs_proximity_json(filename: str = 'data/ARTIST_PAIRS_PROXIMITY.json') -> dict:
+def load_artist_pairs_proximity_json(filename: str = 'data/artist_pairs_proximity.json') -> dict:
     with open(filename, 'r') as file:
         return json.load(file)
 
@@ -38,7 +43,7 @@ def get_recommendations(
         limited_recommendations = OrderedDict()
         i = 0
         for key, val in recommendations.items():
-            if i > max_len:
+            if i >= max_len:
                 break
             i += 1
             limited_recommendations.update({key: val})
@@ -65,9 +70,17 @@ def main():
     # create_artist_pairs_proximity_json(tree)
     artist_pairs_proximity = load_artist_pairs_proximity_json()
     max_general_proximity = calc_max_general_proximity(artist_pairs_proximity)
-    normalize_proximities(artist_pairs_proximity, max_general_proximity)
+    min_general_proximity = calc_min_general_proximity(artist_pairs_proximity)
+    normalize_proximities(artist_pairs_proximity, min_general_proximity, max_general_proximity)
+    max_distance_between_nodes = calc_max_distance_between_nodes(tree)
 
-    # print_all_artist_pairs_proximity(ARTIST_PAIRS_PROXIMITY)
+    # values = []
+    # for artist, pair in artist_pairs_proximity.items():
+    #     print(artist, pair)
+    #     values += list(pair.values())
+    # print('SORTED PROXIMITIES', sorted(values))
+
+    # print_all_artist_pairs_proximity(artist_pairs_proximity)
 
     ## ноды для мер близости
     atl = Node.get_child_by_name(tree, 'atl')
@@ -78,13 +91,20 @@ def main():
     krovostok = Node.get_child_by_name(tree, 'кровосток')
     liga = Node.get_child_by_name(tree, 'лигалайз')
     jah = Node.get_child_by_name(tree, 'jah khalib')
+    krec= Node.get_child_by_name(tree, 'krec')
+    mnogotochie = Node.get_child_by_name(tree, 'многоточие')
+
+    # proximity = generalizing_proximity_measure(
+    #     tree, atl, atl, max_distance_between_nodes, min_general_proximity, max_general_proximity
+    # )
+    # print(proximity)
 
     ## сравнение
     # artist_pairs = [(marlow, max_korj), (lsp, marlow), (lsp, max_korj), (lsp, atl), (lsp, mukka), (lsp, krovostok),
     #                 (krovostok, mukka), (liga, jah)]
-    # compare_measures(tree, artist_pairs, max_general_proximity)
-
-    show_recommendations(atl, artist_pairs_proximity, show_proximity=True)
+    # compare_measures(tree, artist_pairs, min_general_proximity, max_general_proximity)
+    #
+    # show_recommendations(atl, artist_pairs_proximity, show_proximity=True)
 
 
 if __name__ == '__main__':
