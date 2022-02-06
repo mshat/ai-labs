@@ -28,7 +28,7 @@ layout = [
     ],
     [
         sg.Text('Сколько артистов выводить (число или "all"):', size=(33, 1)),
-        sg.InputText(default_text='5', key='_max_len_', size=(5, 1))
+        sg.InputText(default_text='6', key='_max_len_', size=(5, 1))
     ],
     [sg.Checkbox('Очищать вывод', default=True, key='_clean_output_'), sg.Checkbox('DEBUG', default=True, key='_debug_')],
     [sg.Button('Очистить поля ввода')],
