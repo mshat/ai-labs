@@ -1,13 +1,13 @@
-import random
 import time
 from typing import List
-from .fitness import calc_one_max_fitness
-from .population import Population, Individual
-from .selecting import tournament_selector
-from .crossing import one_point_crossing
-from .mutating import invert_bit_mutation
+from genetic_algorithm.population import Population
+from genetic_algorithm.selecting import tournament_selector
+from genetic_algorithm.crossing import one_point_crossing
+from genetic_algorithm.mutating import invert_bit_mutation
 
-FITNESS_FUNCTION = calc_one_max_fitness
+
+def calc_one_max_fitness(chromosome) -> int:
+    return sum(chromosome.gene_values)
 
 
 def save_data_for_plot(
@@ -29,6 +29,7 @@ def solve_with_genetic_algorithm(
 ) -> (List[float], List[float]):
     time_start = time.time()
     population = Population(
+        fitness_function=calc_one_max_fitness,
         selection_function=tournament_selector,
         crossing_function=one_point_crossing,
         mutation_function=invert_bit_mutation,

@@ -9,6 +9,7 @@ FITNESS_FUNCTION = calc_one_max_fitness
 class Population:
     def __init__(
             self,
+            fitness_function,
             selection_function,
             crossing_function,
             mutation_function,
@@ -18,31 +19,35 @@ class Population:
             chromosome_len: int = None,
 
     ):
-        self.selection_function = selection_function
-        self.crossing_function = crossing_function
-        self.mutation_function = mutation_function
+        self._fitness_function = fitness_function
+        self._selection_function = selection_function
+        self._crossing_function = crossing_function
+        self._mutation_function = mutation_function
+
         assert bool(chromosomes) + bool(members) + bool(size and chromosome_len) == 1
         if chromosomes:
-            self.members: List[Individual] = [Individual(chromosome=chromosome) for chromosome in chromosomes]
+            self.members: List[Individual] = \
+                [Individual(self._fitness_function, chromosome=chromosome) for chromosome in chromosomes]
         elif members:
             self.members: List[Individual] = members
         elif size and chromosome_len:
-            self.members: List[Individual] = [Individual(chromosome_len=chromosome_len) for i in range(size)]
+            self.members: List[Individual] = \
+                [Individual(self._fitness_function, chromosome_len=chromosome_len) for i in range(size)]
 
     def select(self):
-        self.members = self.selection_function(self, n=3)
+        self.members = self._selection_function(self, n=3)
 
     def mutate(self, mutation_probability: float = 0.1) -> None:
         for member in self.members:
             if random.random() < mutation_probability:
-                self.mutation_function(member, gene_mutation_probability=1.0 / len(member.chromosome))
+                self._mutation_function(member, gene_mutation_probability=1.0 / len(member._chromosome))
 
     def crossover(self, crossover_probability: float = 0.9):
         crossovered_members: List[Individual] = []
 
         for parent1, parent2 in zip(self.members[::2], self.members[1::2]):
             if random.random() < crossover_probability:
-                child1, child2 = self.crossing_function(parent1, parent2)
+                child1, child2 = self._crossing_function(parent1, parent2)
             else:
                 child1, child2 = parent1, parent2
             crossovered_members.append(child1)
@@ -81,27 +86,34 @@ class Chromosome:
 
 
 class Individual:
-    def __init__(self, other: Individual = None, chromosome: Chromosome = None, chromosome_len: int = None):
+    def __init__(self, fitness_function, other: Individual = None, chromosome: Chromosome = None, chromosome_len: int = None):
         assert bool(other) + bool(chromosome) + bool(chromosome_len) == 1
         if other:
-            self.chromosome: Chromosome = other.chromosome
+            self._chromosome: Chromosome = other._chromosome
         elif chromosome_len:
-            self.chromosome: Chromosome = Chromosome([Gene(random.randint(0, 1)) for i in range(chromosome_len)])
+            self._chromosome: Chromosome = Chromosome([Gene(random.randint(0, 1)) for i in range(chromosome_len)])
         elif chromosome:
-            self.chromosome: Chromosome = chromosome
-        self.fitness_calculator = FITNESS_FUNCTION
-        if isinstance(self.chromosome, Individual):
-            print('Я охуел, да')
+            self._chromosome: Chromosome = chromosome
+        self.fitness_calculator = fitness_function
+
+    @property
+    def chromosome(self):
+        return self._chromosome
+
+    @chromosome.setter
+    def chromosome(self, val: Chromosome):
+        assert isinstance(val, Chromosome)
+        self._chromosome = val
 
     @property
     def fitness(self) -> int:
-        return self.fitness_calculator(self.chromosome)
+        return self.fitness_calculator(self._chromosome)
 
     def __len__(self):
-        return len(self.chromosome)
+        return len(self._chromosome)
 
     def __str__(self):
-        if len(self.chromosome) <= 10:
-            return f'{self.chromosome} fitness: {self.fitness}'
+        if len(self._chromosome) <= 10:
+            return f'{self._chromosome} fitness: {self.fitness}'
         else:
-            return f'Индивид с хромосомой длиной {len(self.chromosome)} fitness: {self.fitness}'
+            return f'Индивид с хромосомой длиной {len(self._chromosome)} fitness: {self.fitness}'

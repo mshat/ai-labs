@@ -1,4 +1,4 @@
-from one_max.one_max import solve_with_genetic_algorithm, save_data_for_plot
+from one_max import solve_with_genetic_algorithm, save_data_for_plot
 #from plot_fitness_data import plot
 
 

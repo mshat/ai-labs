@@ -27,10 +27,7 @@ def tournament_selector(population: Population, n: int = 3) -> List[Individual]:
     for i in range(population_len):
         indexes = get_different_indexes(n, population_len)
 
-        parents.append(
-            Individual(other=max(
-                [population.members[i] for i in indexes], key=lambda ind: ind.fitness))
-        )
+        parents.append(max([population.members[i] for i in indexes], key=lambda ind: ind.fitness))
 
     return parents
 

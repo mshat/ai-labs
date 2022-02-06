@@ -9,6 +9,8 @@ def one_point_crossing(parent1: Individual, parent2: Individual) -> (Individual,
     второй потомок получает гены второго родитля до индекса s и гены первого родителя начиная с индекса s
     """
     s = random.randint(2, len(parent1)-3)  # TODO почему с 2, а не с 1?
-    child1 = Individual(chromosome=Chromosome(parent1.chromosome.genes[:s] + parent2.chromosome.genes[s:]))
-    child2 = Individual(chromosome=Chromosome(parent2.chromosome.genes[:s] + parent1.chromosome.genes[s:]))
-    return child1, child2
+    parent1_chromosome = parent1.chromosome
+    parent2_chromosome = parent2.chromosome
+    parent1.chromosome = Chromosome(parent1_chromosome.genes[:s] + parent2_chromosome.genes[s:])
+    parent2.chromosome = Chromosome(parent2_chromosome.genes[:s] + parent1_chromosome.genes[s:])
+    return parent1, parent2
