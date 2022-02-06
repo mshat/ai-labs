@@ -1,11 +1,10 @@
-import random
 import time
 from typing import List
-from .fitness import calc_one_max_fitness
-from .population import Population, Individual
-from .selecting import tournament_selector
-from .crossing import one_point_crossing
-from .mutating import invert_bit_mutation
+from genetic_algorithm.fitness import calc_one_max_fitness
+from genetic_algorithm.population import Population, Individual
+from genetic_algorithm.selecting import tournament_selector
+from genetic_algorithm.crossing import one_point_crossing
+from genetic_algorithm.mutating import invert_bit_mutation
 
 FITNESS_FUNCTION = calc_one_max_fitness
 
@@ -57,11 +56,12 @@ def solve_with_genetic_algorithm(
         max_fitness_values.append(max_fitness)
         avg_fitness_values.append(avg_fitness)
         if debug:
+            print(population)
             print(f"Поколение {generation_counter}: Макс приспособ. = {max_fitness}, Средняя приспособ.= {avg_fitness}")
 
         best_individual_index = fitness_values.index(max(fitness_values))
-        if debug:
-            print("Лучший индивидуум = ", population.members[best_individual_index], "\n")
+        # if debug:
+        #     print("Лучший индивидуум = ", population.members[best_individual_index], "\n")
 
         if max_fitness > best_fitness:
             best_fitness = max_fitness

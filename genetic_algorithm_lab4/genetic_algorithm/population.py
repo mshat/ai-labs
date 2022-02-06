@@ -47,6 +47,8 @@ class Population:
                 child1, child2 = parent1, parent2
             crossovered_members.append(child1)
             crossovered_members.append(child2)
+        if len(self.members) % 2 != 0:
+            crossovered_members.append(self.members[-1])
         self.members = crossovered_members
 
     def __len__(self):
@@ -67,6 +69,12 @@ class Gene:
     def __init__(self, value):
         self.value = value
 
+    def invert_value(self):
+        self.value = 0 if self.value == 1 else 1
+
+    def __str__(self):
+        return str(self.value)
+
 
 class Chromosome:
     def __init__(self, genes: List[Gene]):
@@ -75,6 +83,9 @@ class Chromosome:
     @property
     def gene_values(self) -> List:
         return [gene.value for gene in self.genes]
+
+    def __str__(self):
+        return str(self.gene_values)
 
     def __len__(self):
         return len(self.genes)
@@ -90,8 +101,6 @@ class Individual:
         elif chromosome:
             self.chromosome: Chromosome = chromosome
         self.fitness_calculator = FITNESS_FUNCTION
-        if isinstance(self.chromosome, Individual):
-            print('Я охуел, да')
 
     @property
     def fitness(self) -> int:
