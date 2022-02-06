@@ -28,6 +28,7 @@ def solve_with_genetic_algorithm(
 ) -> (List[float], List[float]):
     time_start = time.time()
     population = Population(
+        fitness_function=calc_one_max_fitness,
         selection_function=tournament_selector,
         crossing_function=one_point_crossing,
         mutation_function=invert_bit_mutation,
@@ -41,6 +42,9 @@ def solve_with_genetic_algorithm(
 
     generation_counter = 0
     while generation_counter < max_generations:
+        if best_fitness == chromosome_len:
+            print(f'ПРЕДВАРИТЕЛЬНОЕ ЗАВЕРШЕНИЕ НА {generation_counter} ИТЕРАЦИИ')
+            break
         generation_counter += 1
 
         population.select()

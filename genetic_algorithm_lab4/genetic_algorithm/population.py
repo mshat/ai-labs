@@ -9,6 +9,7 @@ FITNESS_FUNCTION = calc_one_max_fitness
 class Population:
     def __init__(
             self,
+            fitness_function,
             selection_function,
             crossing_function,
             mutation_function,
@@ -18,38 +19,32 @@ class Population:
             chromosome_len: int = None,
 
     ):
-        self.selection_function = selection_function
-        self.crossing_function = crossing_function
-        self.mutation_function = mutation_function
+        self._fitness_function = fitness_function
+        self._selection_function = selection_function
+        self._crossing_function = crossing_function
+        self._mutation_function = mutation_function
         assert bool(chromosomes) + bool(members) + bool(size and chromosome_len) == 1
         if chromosomes:
-            self.members: List[Individual] = [Individual(chromosome=chromosome) for chromosome in chromosomes]
+            self.members: List[Individual] = \
+                [Individual(fitness_function, chromosome=chromosome) for chromosome in chromosomes]
         elif members:
             self.members: List[Individual] = members
         elif size and chromosome_len:
-            self.members: List[Individual] = [Individual(chromosome_len=chromosome_len) for i in range(size)]
+            self.members: List[Individual] = \
+                [Individual(fitness_function, chromosome_len=chromosome_len) for i in range(size)]
 
     def select(self):
-        self.members = self.selection_function(self, n=3)
+        self.members = self._selection_function(self, n=3)
 
     def mutate(self, mutation_probability: float = 0.1) -> None:
         for member in self.members:
             if random.random() < mutation_probability:
-                self.mutation_function(member, gene_mutation_probability=1.0 / len(member.chromosome))
+                self._mutation_function(member)
 
     def crossover(self, crossover_probability: float = 0.9):
-        crossovered_members: List[Individual] = []
-
         for parent1, parent2 in zip(self.members[::2], self.members[1::2]):
             if random.random() < crossover_probability:
-                child1, child2 = self.crossing_function(parent1, parent2)
-            else:
-                child1, child2 = parent1, parent2
-            crossovered_members.append(child1)
-            crossovered_members.append(child2)
-        if len(self.members) % 2 != 0:
-            crossovered_members.append(self.members[-1])
-        self.members = crossovered_members
+                self._crossing_function(parent1, parent2)
 
     def __len__(self):
         return len(self.members)
@@ -61,7 +56,9 @@ class Population:
             for member in self.members:
                 res += f'{member}\n'
         else:
-            res += '\nThere are too many members to display\n'
+            for member in self.members:
+                res += f'{member.fitness} '
+            #res += '\nThere are too many members to display\n'
         return res
 
 
@@ -92,7 +89,13 @@ class Chromosome:
 
 
 class Individual:
-    def __init__(self, other: Individual = None, chromosome: Chromosome = None, chromosome_len: int = None):
+    def __init__(
+            self,
+            fitness_function,
+            other: Individual = None,
+            chromosome: Chromosome = None,
+            chromosome_len: int = None
+    ):
         assert bool(other) + bool(chromosome) + bool(chromosome_len) == 1
         if other:
             self.chromosome: Chromosome = other.chromosome
@@ -100,7 +103,7 @@ class Individual:
             self.chromosome: Chromosome = Chromosome([Gene(random.randint(0, 1)) for i in range(chromosome_len)])
         elif chromosome:
             self.chromosome: Chromosome = chromosome
-        self.fitness_calculator = FITNESS_FUNCTION
+        self.fitness_calculator = fitness_function
 
     @property
     def fitness(self) -> int:
