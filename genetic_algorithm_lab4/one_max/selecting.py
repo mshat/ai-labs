@@ -17,7 +17,7 @@ def get_different_indexes(n: int, num: int):
     return indexes
 
 
-def tournament_selector(population: Population, n: int = 3) -> Population:
+def tournament_selector(population: Population, n: int = 3) -> List[Individual]:
     """
     Из популяции случайно выбирается n объектов, среди них отбирается лучший.
     Он будет использован как родитель в операции скрещивания
@@ -32,6 +32,6 @@ def tournament_selector(population: Population, n: int = 3) -> Population:
                 [population.members[i] for i in indexes], key=lambda ind: ind.fitness))
         )
 
-    return Population(members=parents)
+    return parents
 
 

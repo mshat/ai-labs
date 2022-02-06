@@ -10,25 +10,6 @@ from .mutating import invert_bit_mutation
 FITNESS_FUNCTION = calc_one_max_fitness
 
 
-def crossover(population: Population, crossover_probability: float = 0.9) -> Population:
-    crossovered_members: List[Individual] = []
-
-    for parent1, parent2 in zip(population.members[::2], population.members[1::2]):
-        if random.random() < crossover_probability:
-            child1, child2 = one_point_crossing(parent1, parent2)
-        else:
-            child1, child2 = parent1, parent2
-        crossovered_members.append(child1)
-        crossovered_members.append(child2)
-    return Population(members=crossovered_members)
-
-
-def mutate(population: Population, mutation_probability: float = 0.1) -> None:
-    for member in population.members:
-        if random.random() < mutation_probability:
-            invert_bit_mutation(member, gene_mutation_probability=1.0 / len(member.chromosome))
-
-
 def save_data_for_plot(
         max_fitness_values: List[float],
         avg_fitness_values: List[float],
@@ -47,7 +28,13 @@ def solve_with_genetic_algorithm(
         debug=False
 ) -> (List[float], List[float]):
     time_start = time.time()
-    population = Population(size=population_size, chromosome_len=chromosome_len)
+    population = Population(
+        selection_function=tournament_selector,
+        crossing_function=one_point_crossing,
+        mutation_function=invert_bit_mutation,
+        size=population_size,
+        chromosome_len=chromosome_len
+    )
 
     max_fitness_values = []
     avg_fitness_values = []
@@ -56,11 +43,12 @@ def solve_with_genetic_algorithm(
     generation_counter = 0
     while generation_counter < max_generations:
         generation_counter += 1
-        population = tournament_selector(population)
 
-        population = crossover(population, crossover_probability)
+        population.select()
 
-        mutate(population, mutation_probability)
+        population.crossover(crossover_probability)
+
+        population.mutate(mutation_probability)
 
         fitness_values = [member.fitness for member in population.members]
 
