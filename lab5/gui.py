@@ -70,9 +70,9 @@ def filter(filters, recommendations, exclude=None):
             continue
         if sex != 'anysex' and artist.sex != sex and 'sex' not in exclude:
             continue
-        if older and artist.age < older and 'older' not in exclude:
+        if older and artist.age <= older and 'older' not in exclude:
             continue
-        if younger and artist.age > younger and 'younger' not in exclude:
+        if younger and artist.age >= younger and 'younger' not in exclude:
             continue
         filtered_recommendations.append(artist_name)
     return filtered_recommendations

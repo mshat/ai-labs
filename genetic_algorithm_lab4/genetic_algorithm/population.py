@@ -1,9 +1,7 @@
 from __future__ import annotations
 import random
 from typing import List
-from .fitness import calc_one_max_fitness
-
-FITNESS_FUNCTION = calc_one_max_fitness
+import copy
 
 
 class Population:
@@ -33,6 +31,12 @@ class Population:
             self.members: List[Individual] = \
                 [Individual(fitness_function, chromosome_len=chromosome_len) for i in range(size)]
 
+    def get_n_best_members(self, n):
+        sorted_chromosomes = [member.chromosome for member in self.members]
+        sorted_chromosomes = sorted(sorted_chromosomes, key=self._fitness_function)
+        sorted_chromosomes.reverse()
+        return [Individual(self._fitness_function, chromosome=copy.deepcopy(chromosome)) for chromosome in sorted_chromosomes][:n]
+
     def select(self):
         self.members = self._selection_function(self, n=3)
 
@@ -50,15 +54,20 @@ class Population:
         return len(self.members)
 
     def __str__(self):
+        global LOG
         res = f'Population: members number {len(self.members)} '
         if len(self.members) < 10:
             res += '\nMembers:\n'
             for member in self.members:
                 res += f'{member}\n'
+            LOG += res
         else:
+            LOG += res
             for member in self.members:
-                res += f'{member.fitness} '
-            #res += '\nThere are too many members to display\n'
+                LOG += f'{member.fitness} '
+            LOG += '\n'
+
+            res += '\nThere are too many members to display\n'
         return res
 
 

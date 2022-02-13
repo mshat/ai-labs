@@ -76,7 +76,7 @@ def recommend_by_liked(liked_artist_names: str, max_output_len=5, show=True):
 def check_artist_like_dislike(artist, dislikes, debug=True) -> bool:
     for dislike in dislikes:
         artist_dislike_proximity = generalizing_proximity_measure(TREE, artist, dislike, max_distance_between_nodes, min_proximity, max_proximity)
-        if artist_dislike_proximity < 0.49:
+        if artist_dislike_proximity < 0.49:  # TODO порог похожести на дизлайк
             if debug:
                 print(f'[DEBUG] {artist} похож на {dislike}: {artist_dislike_proximity}')
             return False
@@ -152,7 +152,7 @@ def recommend_by_liked_old(liked_artist_names: str, max_output_len=5):
         print()
 
     final_recommendation = {}
-    proximity_threshold = 0.6
+    proximity_threshold = 0.6  # TODO
 
     for liked_artist1 in liked_artists:
         for liked_artist2 in liked_artists:
