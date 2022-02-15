@@ -123,57 +123,5 @@ def recommend_by_disliked(disliked_artists: str, liked_artist_names: str, max_ou
     return final
 
 
-def recommend_by_disliked2(disliked_artists: str, liked_artist_names: str, max_output_len=5, debug=True):
-    disliked_artist_names_list = split_artists(disliked_artists)
-    disliked_artists = {find_artist(artist.lower()) for artist in disliked_artist_names_list}
-    #print(disliked_artists)
-    final_recommendation_artists = recommend_by_liked(liked_artist_names, max_output_len, show=False)
-    #print(res)
-    for i, artist_name in enumerate(final_recommendation_artists):
-        if i < max_output_len:
-            # print(artist_name, final_recommendations[artist_name])
-            if artist_name not in disliked_artist_names_list:
-                print(artist_name)
-
-
-def recommend_by_liked_old(liked_artist_names: str, max_output_len=5):
-    liked_artist_names_list = split_artists(liked_artist_names)
-    liked_artists = {find_artist(artist.lower()) for artist in liked_artist_names_list}
-
-    artist_recommendations = {}
-    for artist in liked_artists:
-        artist_recommendations[artist] = get_recommendations(artist, ARTIST_PAIRS_PROXIMITY)
-
-    for liked_artist, rec in artist_recommendations.items():
-        print(liked_artist)
-        for item, val in rec.items():
-            print(item, val)
-        print()
-        print()
-
-    final_recommendation = {}
-    proximity_threshold = 0.6  # TODO
-
-    for liked_artist1 in liked_artists:
-        for liked_artist2 in liked_artists:
-            if liked_artist1 == liked_artist2:
-                continue
-            for recommended_artist_name in artist_recommendations[liked_artist2]:
-                recommended_artist = find_artist(recommended_artist_name)
-                if liked_artist1 == recommended_artist:
-                    continue
-                liked_recommended_artists_proximity = generalizing_proximity_measure(
-                    TREE, liked_artist1, recommended_artist, max_distance_between_nodes, min_proximity, max_proximity
-                )
-                if liked_recommended_artists_proximity < proximity_threshold:
-                    if recommended_artist in final_recommendation and proximity_threshold < final_recommendation[recommended_artist]:
-                        final_recommendation[recommended_artist] = liked_recommended_artists_proximity
-                    final_recommendation[recommended_artist] = liked_recommended_artists_proximity
-                #print(liked_artist1, recommended_artist, liked_recommended_artists_proximity)
-
-    final_recommendation = sorted(final_recommendation.items(), key=lambda item: item[1])
-    for recommended_artist, proximity in final_recommendation:
-        print(recommended_artist, proximity)
-
 
 
