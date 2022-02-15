@@ -1,9 +1,7 @@
 from __future__ import annotations
 import random
 from typing import List
-from .fitness import calc_one_max_fitness
-
-FITNESS_FUNCTION = calc_one_max_fitness
+import copy
 
 
 class Population:
@@ -23,16 +21,21 @@ class Population:
         self._selection_function = selection_function
         self._crossing_function = crossing_function
         self._mutation_function = mutation_function
-
         assert bool(chromosomes) + bool(members) + bool(size and chromosome_len) == 1
         if chromosomes:
             self.members: List[Individual] = \
-                [Individual(self._fitness_function, chromosome=chromosome) for chromosome in chromosomes]
+                [Individual(fitness_function, chromosome=chromosome) for chromosome in chromosomes]
         elif members:
             self.members: List[Individual] = members
         elif size and chromosome_len:
             self.members: List[Individual] = \
-                [Individual(self._fitness_function, chromosome_len=chromosome_len) for i in range(size)]
+                [Individual(fitness_function, chromosome_len=chromosome_len) for i in range(size)]
+
+    def get_n_best_members(self, n):
+        sorted_chromosomes = [member.chromosome for member in self.members]
+        sorted_chromosomes = sorted(sorted_chromosomes, key=self._fitness_function)
+        sorted_chromosomes.reverse()
+        return [Individual(self._fitness_function, chromosome=copy.deepcopy(chromosome)) for chromosome in sorted_chromosomes][:n]
 
     def select(self):
         self.members = self._selection_function(self, n=3)
@@ -40,30 +43,30 @@ class Population:
     def mutate(self, mutation_probability: float = 0.1) -> None:
         for member in self.members:
             if random.random() < mutation_probability:
-                self._mutation_function(member, gene_mutation_probability=1.0 / len(member._chromosome))
+                self._mutation_function(member)
 
     def crossover(self, crossover_probability: float = 0.9):
-        crossovered_members: List[Individual] = []
-
         for parent1, parent2 in zip(self.members[::2], self.members[1::2]):
             if random.random() < crossover_probability:
-                child1, child2 = self._crossing_function(parent1, parent2)
-            else:
-                child1, child2 = parent1, parent2
-            crossovered_members.append(child1)
-            crossovered_members.append(child2)
-        self.members = crossovered_members
+                self._crossing_function(parent1, parent2)
 
     def __len__(self):
         return len(self.members)
 
     def __str__(self):
+        global LOG
         res = f'Population: members number {len(self.members)} '
         if len(self.members) < 10:
             res += '\nMembers:\n'
             for member in self.members:
                 res += f'{member}\n'
+            LOG += res
         else:
+            LOG += res
+            for member in self.members:
+                LOG += f'{member.fitness} '
+            LOG += '\n'
+
             res += '\nThere are too many members to display\n'
         return res
 
@@ -71,6 +74,12 @@ class Population:
 class Gene:
     def __init__(self, value):
         self.value = value
+
+    def invert_value(self):
+        self.value = 0 if self.value == 1 else 1
+
+    def __str__(self):
+        return str(self.value)
 
 
 class Chromosome:
@@ -81,39 +90,39 @@ class Chromosome:
     def gene_values(self) -> List:
         return [gene.value for gene in self.genes]
 
+    def __str__(self):
+        return str(self.gene_values)
+
     def __len__(self):
         return len(self.genes)
 
 
 class Individual:
-    def __init__(self, fitness_function, other: Individual = None, chromosome: Chromosome = None, chromosome_len: int = None):
+    def __init__(
+            self,
+            fitness_function,
+            other: Individual = None,
+            chromosome: Chromosome = None,
+            chromosome_len: int = None
+    ):
         assert bool(other) + bool(chromosome) + bool(chromosome_len) == 1
         if other:
-            self._chromosome: Chromosome = other._chromosome
+            self.chromosome: Chromosome = other.chromosome
         elif chromosome_len:
-            self._chromosome: Chromosome = Chromosome([Gene(random.randint(0, 1)) for i in range(chromosome_len)])
+            self.chromosome: Chromosome = Chromosome([Gene(random.randint(0, 1)) for i in range(chromosome_len)])
         elif chromosome:
-            self._chromosome: Chromosome = chromosome
+            self.chromosome: Chromosome = chromosome
         self.fitness_calculator = fitness_function
 
     @property
-    def chromosome(self):
-        return self._chromosome
-
-    @chromosome.setter
-    def chromosome(self, val: Chromosome):
-        assert isinstance(val, Chromosome)
-        self._chromosome = val
-
-    @property
     def fitness(self) -> int:
-        return self.fitness_calculator(self._chromosome)
+        return self.fitness_calculator(self.chromosome)
 
     def __len__(self):
-        return len(self._chromosome)
+        return len(self.chromosome)
 
     def __str__(self):
-        if len(self._chromosome) <= 10:
-            return f'{self._chromosome} fitness: {self.fitness}'
+        if len(self.chromosome) <= 10:
+            return f'{self.chromosome} fitness: {self.fitness}'
         else:
-            return f'Индивид с хромосомой длиной {len(self._chromosome)} fitness: {self.fitness}'
+            return f'Индивид с хромосомой длиной {len(self.chromosome)} fitness: {self.fitness}'

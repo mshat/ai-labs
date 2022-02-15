@@ -1,4 +1,5 @@
 import random
+import copy
 from typing import List
 from .population import Population, Individual
 
@@ -27,7 +28,7 @@ def tournament_selector(population: Population, n: int = 3) -> List[Individual]:
     for i in range(population_len):
         indexes = get_different_indexes(n, population_len)
 
-        parents.append(max([population.members[i] for i in indexes], key=lambda ind: ind.fitness))
+        parents.append(copy.deepcopy(max([population.members[i] for i in indexes], key=lambda ind: ind.fitness)))
 
     return parents
 
