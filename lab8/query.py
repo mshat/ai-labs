@@ -1,55 +1,126 @@
 from typing import List
-from sentence import Word
-from data import ARTISTS, GENRES
+from word import Word, Placeholder
+from data import ARTISTS, GENRES, GENDERS
 
 
-class ParameterError(Exception): pass
-class ArtistParameterError(ParameterError): pass
-class GenreParameterError(ParameterError): pass
+class ArgumentError(Exception): pass
+class ArtistArgumentError(ArgumentError): pass
+class GenreArgumentError(ArgumentError): pass
 
 
-class Parameter:
-    def __init__(self, parameter):
-        self._parameter = parameter
+class Argument:
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return f'Argument: {self.value}'
+
+    def __repr__(self):
+        return self.__str__()
 
 
-class NumParameter(Parameter):
-    def __init__(self, parameter: str):
-        super().__init__(parameter)
-        if not isinstance(parameter, int) or not isinstance(parameter, float):
-            raise ParameterError('Wrong parameter type')
+class NumArgument(Argument):
+    def __init__(self, value: str):
+        super().__init__(value)
+        if not value.isdigit():
+            raise ArgumentError('Wrong value type')
 
 
-class StrParameter(Parameter):
-    def __init__(self, parameter: str):
-        super().__init__(parameter)
-        if not isinstance(parameter, str):
-            raise ParameterError('Wrong parameter type')
+class StrArgument(Argument):
+    def __init__(self, value: str):
+        super().__init__(value)
+        if not isinstance(value, str):
+            raise ArgumentError('Wrong value type')
 
 
-class ArtistParameter(StrParameter):
-    def __init__(self, parameter: str):
-        super().__init__(parameter)
-        if self._parameter.lower() not in ARTISTS:
-            raise ArtistParameterError('This artist is not found ')
+class SexArgument(StrArgument):
+    def __init__(self, value: str):
+        super().__init__(value)
+        if self.value.lower() not in GENDERS.values():
+            raise ArtistArgumentError('This sex is not found ')
 
 
-class GenreParameter(StrParameter):
-    def __init__(self, parameter: str):
-        super().__init__(parameter)
-        if self._parameter.lower() not in ARTISTS:
-            raise GenreParameterError('This genre is not found ')
+class ArtistArgument(StrArgument):
+    def __init__(self, value: str):
+        super().__init__(value)
+        if self.value.lower() not in ARTISTS:
+            raise ArtistArgumentError('This artist is not found ')
+
+
+class GenreArgument(StrArgument):
+    def __init__(self, value: str):
+        super().__init__(value)
+        if self.value.lower() not in GENRES:
+            raise GenreArgumentError('This genre is not found ')
 
 
 class Query:
-    _verb: Word
-    _params: List[Parameter]
-    _allowed_verbs: List[str]
+    _raw_sentence: str
+    _words: List[Word]
+    _arguments: List[Argument]
+    is_question: bool
 
-    def __init__(self, verb: Word, params: List[Parameter]):
-        self._verb = verb
-        self._params = params
+    def __init__(self, raw_sentence: str, words: List[Word], arguments: List[Argument] = None, is_question=True):
+        self._raw_sentence = raw_sentence
+        self._words = words
+        self._arguments = [] if arguments is None else arguments
+        self.is_question = is_question
 
+    @property
+    def keywords(self):
+        return [word for word in self._words if isinstance(word, Placeholder) or word.speech_part or word.query_type]
 
-class SearchQuery(Query):
-    pass
+    @property
+    def words(self):
+        return self._words
+
+    @property
+    def arguments(self):
+        arguments = {}
+        for arg in self._arguments:
+            key = type(arg).__name__
+            if key not in arguments:
+                arguments[key] = [arg]
+            else:
+                arguments[key].append(arg)
+        return arguments
+
+    @property
+    def query_structure(self):
+        query_structure = {}
+        for keyword in self.keywords:
+            if not isinstance(keyword, Placeholder):
+                if keyword.query_type not in query_structure:
+                    query_structure[keyword.query_type] = [keyword]
+                else:
+                    query_structure[keyword.query_type].append(keyword)
+        return query_structure
+
+    @property
+    def tags_query_structure(self):
+        query_structure = {}
+        for keyword in self.keywords:
+            if not isinstance(keyword, Placeholder):
+                if keyword.speech_part not in query_structure:
+                    query_structure[keyword.speech_part] = [keyword]
+                else:
+                    query_structure[keyword.speech_part].append(keyword)
+        return query_structure
+
+    # @property
+    # def query_structure(self):
+    #     query_structure = [f'{keyword.query_type} {keyword.speech_part} - {keyword.normal}' for keyword in self.keywords
+    #                        if not isinstance(keyword, Placeholder)]
+    #     query_structure += [f'{type(arg)}-{arg}' for arg in self._arguments]
+    #     return query_structure
+
+    def __str__(self):
+        res = 'Предложение:\n' if not self.is_question else 'Вопросительное предложение:\n'
+        res += f"\tRaw: {self._raw_sentence}\n"
+        res += "\tParsed: "
+        if len(self._words) > 30:
+            res += f"cодержит {len(self.keywords)} ключевых слов"
+        else:
+            res += ' '.join([str(word) for word in self.keywords])
+        res += f"\n\tArguments: {self._arguments}"
+        return res
