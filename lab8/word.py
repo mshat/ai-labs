@@ -19,18 +19,16 @@ class Word(BaseWord):
     word: str
     normal: str
     morph_speech_part: str
-    speech_part: str
-    query_type: str
+    tag: str
 
-    def __init__(self, word: str, normal_word: str, morph_speech_part: str, speech_part: str, query_type: str):
+    def __init__(self, word: str, normal_word: str, morph_speech_part: str, tag: str):
         super().__init__(word)
         self.normal = normal_word
         self.morph_speech_part = morph_speech_part
-        self.speech_part = speech_part
-        self.query_type = query_type
+        self.tag = tag
 
     def __str__(self):
-        return f'{self.normal}[{self.speech_part} {self.morph_speech_part} {self.query_type}]'
+        return f'{self.normal}[{self.tag} {self.morph_speech_part}]'
 
     def __repr__(self):
         return self.__str__()

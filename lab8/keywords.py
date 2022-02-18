@@ -1,6 +1,8 @@
 import enum
 from data import keywords as raw_keywords
 
+KEYWORDS = raw_keywords
+
 
 class Keyword:
     def __init__(self, keyword: str, query_type, speech_part):
@@ -15,14 +17,5 @@ class Keyword:
         return self.__str__()
 
 
-def load_keywords(keywords_dict):
-    res = []
-    for query_type, speech_type_keywords in keywords_dict.items():
-        for speech_part, keywords in speech_type_keywords.items():
-            for keyword in keywords:
-                res.append(Keyword(keyword, query_type, speech_part))
-    return res
 
-
-KEYWORDS = load_keywords(raw_keywords)
 

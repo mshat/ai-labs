@@ -9,7 +9,7 @@ class WordClassifier:
 
     @property
     def keywords(self):
-        return {keyword.keyword: keyword for keyword in self._keywords}
+        return {alias: keyword for keyword in self._keywords.keys() for alias in self._keywords[keyword]}
 
     def _exclude_keywords_by_query_type(self, excluded_query_types: List[str]):
         return {keyword.keyword: keyword for keyword in self._keywords if
@@ -21,17 +21,11 @@ class WordClassifier:
         else:
             return self._exclude_keywords_by_query_type(['filter'])
 
-    def classify_speech_part(self, word: str, dialog_state):
-        keywords = self._get_keywords_by_dialog_state(dialog_state)
-        if word not in keywords:
+    def assign_tags(self, word: str, dialog_state):
+        # keywords = self._get_keywords_by_dialog_state(dialog_state)
+        if word not in self.keywords:
             return None
-        return keywords[word].speech_part
-
-    def classify_query_type(self, word: str, dialog_state):
-        keywords = self._get_keywords_by_dialog_state(dialog_state)
-        if word not in keywords:
-            return None
-        return keywords[word].query_type
+        return self.keywords[word]
 
 
 WORD_CLASSIFIER = WordClassifier()

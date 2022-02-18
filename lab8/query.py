@@ -68,7 +68,7 @@ class Query:
 
     @property
     def keywords(self):
-        return [word for word in self._words if isinstance(word, Placeholder) or word.speech_part or word.query_type]
+        return [word for word in self._words if isinstance(word, Placeholder) or word.tag]
 
     @property
     def words(self):
@@ -86,33 +86,15 @@ class Query:
         return arguments
 
     @property
-    def query_structure(self):
-        query_structure = {}
-        for keyword in self.keywords:
-            if not isinstance(keyword, Placeholder):
-                if keyword.query_type not in query_structure:
-                    query_structure[keyword.query_type] = [keyword]
-                else:
-                    query_structure[keyword.query_type].append(keyword)
-        return query_structure
-
-    @property
     def tags_query_structure(self):
         query_structure = {}
         for keyword in self.keywords:
             if not isinstance(keyword, Placeholder):
-                if keyword.speech_part not in query_structure:
-                    query_structure[keyword.speech_part] = [keyword]
+                if keyword.tag not in query_structure:
+                    query_structure[keyword.tag] = [keyword]
                 else:
-                    query_structure[keyword.speech_part].append(keyword)
+                    query_structure[keyword.tag].append(keyword)
         return query_structure
-
-    # @property
-    # def query_structure(self):
-    #     query_structure = [f'{keyword.query_type} {keyword.speech_part} - {keyword.normal}' for keyword in self.keywords
-    #                        if not isinstance(keyword, Placeholder)]
-    #     query_structure += [f'{type(arg)}-{arg}' for arg in self._arguments]
-    #     return query_structure
 
     def __str__(self):
         res = 'Предложение:\n' if not self.is_question else 'Вопросительное предложение:\n'

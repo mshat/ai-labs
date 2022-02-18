@@ -106,6 +106,5 @@ class WordParser:
             word=self._word,
             normal_word=parsed_word.normal_form,
             morph_speech_part=parsed_word.tag.POS,
-            speech_part=WORD_CLASSIFIER.classify_speech_part(parsed_word.normal_form, dialog_state),
-            query_type=WORD_CLASSIFIER.classify_query_type(parsed_word.normal_form, dialog_state),
+            tag=WORD_CLASSIFIER.assign_tags(parsed_word.normal_form, dialog_state),
         )
