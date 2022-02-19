@@ -75,7 +75,7 @@ class Query:
         return self._words
 
     @property
-    def arguments(self):
+    def arguments(self) -> dict:
         arguments = {}
         for arg in self._arguments:
             key = type(arg).__name__
@@ -86,7 +86,7 @@ class Query:
         return arguments
 
     @property
-    def tags_query_structure(self):
+    def query_tag_structure(self) -> dict:
         query_structure = {}
         for keyword in self.keywords:
             if not isinstance(keyword, Placeholder):

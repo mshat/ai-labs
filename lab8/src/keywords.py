@@ -1,4 +1,3 @@
-import enum
 from data import keywords as raw_keywords
 
 KEYWORDS = raw_keywords

@@ -1,4 +1,5 @@
 import unittest
+
 from query_solver import QuerySolver, DialogState
 from parsers import SentenceParser
 
@@ -8,10 +9,19 @@ class DataForTests:
         "найди похожих исполнителей на крека": 'search_by_artist',
         "найди похожих на моргенштерна": 'search_by_artist',
         "похожие на басту": 'search_by_artist',
+        "схожие с кровостоком": 'search_by_artist',
+        'порекомендуй исполнителей, похожих на кизару': 'search_by_artist',
+        'рэперы как рэм': 'search_by_artist',
+        'порекомендуй артистов как гуф': 'search_by_artist',
+        'посоветуй похожих на кизару': 'search_by_artist',
+        'похожие на касту': 'search_by_artist',
     }
     search_by_genre = {
         "найди исполнителей в жанре грайм": 'search_by_genre',
         "исполнители в жанре поп": 'search_by_genre',
+        'рекомендация по жанру клуб': 'search_by_genre',
+        'посоветуй клубный рэп': 'search_by_genre',
+        "порекомендуй клубный рэп": 'search_by_genre',
     }
     search_by_sex = {
         "покажи исполнителей мужчин": 'search_by_sex',
@@ -20,13 +30,20 @@ class DataForTests:
         "артисты женщины": 'search_by_sex',
         "покажи исполнителей мужского пола": 'search_by_sex',
         "исполнители женского пола": 'search_by_sex',
+        "все рэперы женщины": 'search_by_sex',
     }
     search_show_all = {
         "покажи всех исполнителей": 'show_all_artists',
         "все артисты": 'show_all_artists',
+        "все рэперы": 'show_all_artists',
+        "все певцы": 'show_all_artists',
+        "все исполнители": 'show_all_artists',
     }
     test_filter = {
         "оставь исполнителей мужского пола": 'filter_by_sex',
+        "оставь женщин": 'filter_by_sex',
+        "убери женщин": 'filter_by_sex',
+        "выбери женщин": 'filter_by_sex',
         "убери всех исполнителей кроме женского пола": 'filter_by_sex',
         "оставь только соло исполнителей": 'filter_by_members_count',
         "убери всех кроме соло исполнителей": 'filter_by_members_count',
@@ -310,7 +327,6 @@ class TestQueries(unittest.TestCase):
             with self.subTest(i=key):
                 query = SentenceParser(key).parse(query_solver.state)
                 res = query_solver.solve(query)
-
                 self.assertEqual(res, search_sentences[key])
 
     def test_filter(self):

@@ -12,7 +12,12 @@ class BaseWord:
         return f'{self.word}'
 
 
-class Placeholder(BaseWord): pass
+class Placeholder(BaseWord):
+    def __str__(self):
+        return 'Placeholder'
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Word(BaseWord):
