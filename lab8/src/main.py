@@ -1,6 +1,5 @@
 from parsers import SentenceParser
 from query_solver import QuerySolver
-from query_handler import log_query_pattern_strings
 
 
 if __name__ == '__main__':
@@ -12,7 +11,6 @@ if __name__ == '__main__':
     # print(query.words)
     res = query_solver.solve(query)
     print(res)
-    log_query_pattern_strings()
     exit()
 
     # while True:

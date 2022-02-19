@@ -3,12 +3,13 @@ from query import Query
 from tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
 from config import SHOW_QUERY_PATTERNS, DEBUG
 
-QUERY_PATTERN_STRINGS = set()
+QUERY_PATTERN_STRINGS = []
 
 
 def log_query_pattern_strings():
     with open('query_pattern_strings.txt', 'w', encoding='utf-8') as f:
-        for line in sorted(QUERY_PATTERN_STRINGS, key=lambda s: s[:55]):
+        # for line in sorted(QUERY_PATTERN_STRINGS, key=lambda s: s[:55]):
+        for line in QUERY_PATTERN_STRINGS:
             f.write(f'{line}\n')
 
 
@@ -36,8 +37,11 @@ class QueryPattern:
         return res
 
     def __str__(self):
-        conditions = ', '.join([str(cond) for cond in self.conditions])
-        return f'Необходимый аргумент: {self.required_argument_type} | Условия: {conditions}'
+        conditions = ' '.join([str(cond) for cond in self.conditions])
+        conditions_without_first_word = conditions.split()[1:]
+        conditions = ' '.join(conditions_without_first_word)
+
+        return f'Необходимый аргумент: {str(self.required_argument_type).ljust(14)} | Условие: {conditions}'
 
 
 class QueryHandler:
@@ -49,8 +53,8 @@ class QueryHandler:
         self.handle = handle_func
         self.debug_msg = debug_msg
 
+        QUERY_PATTERN_STRINGS.append(self.__str__())
         if SHOW_QUERY_PATTERNS:
-            QUERY_PATTERN_STRINGS.add(self.__str__())
             print(self.__str__())
 
     def match_pattern(self, query: Query):

@@ -1,5 +1,4 @@
 import unittest
-
 from query_solver import QuerySolver, DialogState
 from parsers import SentenceParser
 

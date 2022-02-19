@@ -57,7 +57,7 @@ class AndTagCondition(TagCondition):
     Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
     """
     def __str__(self):
-        return f'And({self.tag})'
+        return f'AND {self.tag}'
 
     def __repr__(self):
         return self.__str__()
@@ -69,7 +69,7 @@ class OrTagCondition(TagCondition):
     Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом
     """
     def __str__(self):
-        return f'Or({self.tag})'
+        return f'OR {self.tag}'
 
     def __repr__(self):
         return self.__str__()
@@ -95,7 +95,10 @@ class AndMultiTagCondition(MultiTagCondition):
     Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
     """
     def __str__(self):
-        return f'AndMul({self.conditions})'
+        conditions = ' '.join([str(condition) for condition in self.conditions])
+        conditions_without_first_word = conditions.split()[1:]
+        conditions = ' '.join(conditions_without_first_word)
+        return f'AND ({conditions})'
 
     def __repr__(self):
         return self.__str__()
@@ -107,7 +110,10 @@ class OrMultiTagCondition(MultiTagCondition):
     Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом
     """
     def __str__(self):
-        return f'OrMul({self.conditions})'
+        conditions = ' '.join([str(condition) for condition in self.conditions])
+        conditions_without_first_word = conditions.split()[1:]
+        conditions = ' '.join(conditions_without_first_word)
+        return f'OR ({conditions})'
 
     def __repr__(self):
         return self.__str__()
