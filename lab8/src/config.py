@@ -1,0 +1,2 @@
+DEBUG = True
+SHOW_QUERY_PATTERNS = True
