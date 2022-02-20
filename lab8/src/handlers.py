@@ -2,6 +2,7 @@ from query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as
                            AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti)
 from dialog_state import DialogState
 from query_handler import log_query_pattern_strings
+from tools import debug_print
 
 
 def get_arguments_by_type(query: Query, argument_type: str):
@@ -55,7 +56,7 @@ def info(query: Query):
 
 def number(query: Query):
     allowed_states = (DialogState.number, DialogState.search, DialogState.start)
-    print(query.arguments.items())
+    debug_print(query.arguments.items())
     return DialogState.number
 
 
@@ -68,9 +69,9 @@ def number_with_sex(query: Query):
 def number_with_age_range(query: Query):
     allowed_states = (DialogState.number, DialogState.search, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) == 2:
+    if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
-        print(f'количество артистов от {from_age} до {to_age} лет')
+        debug_print(f'количество артистов от {from_age} до {to_age} лет')
     else:
         return
     return DialogState.number
@@ -79,43 +80,43 @@ def number_with_age_range(query: Query):
 def number_with_age(query: Query):
     allowed_states = (DialogState.number, DialogState.search, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) == 2:
+    if len(age) >= 2:
         age = age[0]
 
     if 'younger' in query.query_tag_structure:
-        print(f'количество артистов до {age} лет')
+        debug_print(f'количество артистов до {age} лет')
     elif 'older' in query.query_tag_structure:
-        print(f'количество артистов от {age} лет')
+        debug_print(f'количество артистов от {age} лет')
     return DialogState.number
 
 
 def set_result_len(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
-    result_len = get_arguments_by_type(query, 'NumArgument')
-    print(f'Выводить по {result_len} строк')
+    result_len = get_arguments_by_type(query, 'NumArgument')[-1]
+    debug_print(f'Выводить по {result_len} строк')
     return DialogState.count_filter
 
 
 def filter_by_sex_include(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     sex = get_arguments_by_type(query, 'SexArgument')[0]
-    # print(f'Убрать всех, кроме {sex} пола')
+    # debug_debug_print(f'Убрать всех, кроме {sex} пола')
     return DialogState.filter
 
 
 def filter_by_sex_exclude(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     sex = get_arguments_by_type(query, 'SexArgument')[0]
-    print(f'Убрать артистов {sex} пола')
+    debug_print(f'Убрать артистов {sex} пола')
     return DialogState.filter
 
 
 def filter_by_age_range(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) == 2:
+    if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
-        print(f'фильтр от {from_age} до {to_age} лет')
+        debug_print(f'фильтр от {from_age} до {to_age} лет')
     else:
         return
     return DialogState.filter
@@ -127,9 +128,9 @@ def filter_by_age_include(query: Query):
     if len(age) > 1:
         age = age[0]
     if 'younger' in query.query_tag_structure:
-        print(f'фильтр до {age} лет')
+        debug_print(f'фильтр до {age} лет')
     elif 'older' in query.query_tag_structure:
-        print(f'фильтр от {age} лет')
+        debug_print(f'фильтр от {age} лет')
     return DialogState.filter
 
 
@@ -139,9 +140,9 @@ def filter_by_age_exclude(query: Query):
     if len(age) > 1:
         age = age[0]
     if 'younger' in query.query_tag_structure:
-        print(f'фильтр от {age} лет')
+        debug_print(f'фильтр от {age} лет')
     elif 'older' in query.query_tag_structure:
-        print(f'фильтр до {age} лет')
+        debug_print(f'фильтр до {age} лет')
     return DialogState.filter
 
 
@@ -154,7 +155,7 @@ def filter_by_members_count(query: Query):
         members_count_type = 'solo'
     elif 'duet' in tags:
         members_count_type = 'duet'
-    print(f'оставить {members_count_type}')
+    debug_print(f'оставить {members_count_type}')
     return DialogState.filter
 
 
@@ -235,7 +236,6 @@ number_with_sex_handler = QueryHandler(
 
 number_with_age_range_handler = QueryHandler(
     QueryPattern(
-        #[AndMulti([Or('number'), Or('how many')]), AndMulti([Or('older'), Or('younger')])],
         [AndMulti([Or('number'), Or('how many')]), AndMulti([Or('range'), OrMulti([And('older'), And('younger')])])],
         required_arguments={'NumArgument': 2}
     ),
@@ -253,15 +253,15 @@ number_handler = QueryHandler(
     number, 'Количество артистов в базе')
 
 search_by_sex_handler = QueryHandler(
-    QueryPattern([Or('artist'), Or('recommend')], 'SexArgument'),
+    QueryPattern([Or('artist'), Or('recommend'), Or('show')], 'SexArgument'),
     search_by_sex, 'Вывести исполнителей указанного пола')
 
 search_by_genre_handler = QueryHandler(
-    QueryPattern([Or('genre'), Or('recommend')], 'GenreArgument'),
+    QueryPattern([Or('genre'), Or('recommend'), Or('show')], 'GenreArgument'),
     search_by_genre, 'Вывести артистов в определённом жанре')
 
 search_by_artist_handler = QueryHandler(
-    QueryPattern([Or('search'), Or('recommend')], 'ArtistArgument'),
+    QueryPattern([Or('search'), Or('recommend'), Or('show')], 'ArtistArgument'),
     search_by_artist, 'Рекомендация по артисту')
 
 show_all_handler = QueryHandler(

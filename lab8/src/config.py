@@ -1,2 +1,3 @@
 DEBUG = True
+DEBUG_PRINT = True
 SHOW_QUERY_PATTERNS = False
