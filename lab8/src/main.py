@@ -7,9 +7,9 @@ if __name__ == '__main__':
     query_solver = QuerySolver()
     query_solver.state = DialogState.search
 
-    sentence = "убери всех исполнителей кроме женского пола"
+    sentence = "найди похожих исполнителей на крека"
     query = SentenceParser(sentence).parse(query_solver.state)
-    print(query)
+    # print(query)
     # print(query.words)
     res = query_solver.solve(query)
     print(res)

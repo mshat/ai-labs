@@ -23,16 +23,16 @@ class QueryPattern:
         self.conditions = conditions
         self.required_argument_type = required_argument_type
 
-    def match(self, query: Query) -> Tuple[bool, List[Word], Argument]:
+    def match(self, query: Query) -> Tuple[bool, List[Word], List[Argument]]:
         query_tag_structure = query.query_tag_structure
         res = None
         all_used_words = []
-        used_arg = None
+        used_args = []
 
         if self.required_argument_type:
             if self.required_argument_type in query.arguments:
                 res = True
-                used_arg = query.arguments[self.required_argument_type]
+                used_args = query.arguments[self.required_argument_type]
             else:
                 res = False
 
@@ -43,7 +43,7 @@ class QueryPattern:
             res = match_res
         else:
             res *= match_res
-        return res, all_used_words, used_arg
+        return res, all_used_words, used_args
 
     def __str__(self):
         conditions = ' '.join([str(cond) for cond in self.conditions])
@@ -63,18 +63,27 @@ class QueryHandler:
         self.debug_msg = debug_msg
         self.debug_res = debug_res
 
+        self.used_keywords = []
+        self.used_args = []
+
         QUERY_PATTERN_STRINGS.append(self.__str__())
         if SHOW_QUERY_PATTERNS:
             print(self.__str__())
 
     def match_pattern(self, query: Query):
-        res, used_words, used_arg = self.pattern.match(query)
+        res, self.used_keywords, self.used_args = self.pattern.match(query)
         if res:
             if DEBUG:
                 print(f'Запрос: {self.debug_msg}')
         return res
 
-            #return self.handle(query)  # TODO вернуть used_words
+    def remove_used_keywords_and_args(self, query: Query):
+        print(f'!!!!!!!! BEFOIRE {query}')
+        for word in self.used_keywords:
+            query.remove_word(word)
+        for arg in self.used_args:
+            query.remove_argument(arg)
+        print(f'!!!!!!!!!! AFTER {query}')
 
     def __str__(self):
         return f'Запрос: {self.debug_msg.ljust(46)} | Паттерн: {self.pattern}'

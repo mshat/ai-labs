@@ -66,6 +66,12 @@ class Query:
         self._arguments = [] if arguments is None else arguments
         self.is_question = is_question
 
+    def remove_word(self, word: Word):
+        self._words.remove(word)
+
+    def remove_argument(self, arg: Argument):
+        self._arguments.remove(arg)
+
     @property
     def keywords(self):
         return [word for word in self._words if isinstance(word, Placeholder) or word.tag]
