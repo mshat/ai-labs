@@ -80,9 +80,9 @@ class QuerySolver:
             handlers.filter_by_age_exclude_handler,
             handlers.filter_by_age_include_handler,
             handlers.filter_by_members_count_handler,
+            handlers.set_result_len_handler,
             handlers.remove_filters_handler,
             handlers.remove_result_len_filter_handler,
-            handlers.set_result_len_handler,
         ]
         return self.match_patterns(filter_handlers, query)
 
