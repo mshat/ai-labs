@@ -196,7 +196,7 @@ filter_by_age_exclude_handler = QueryHandler(
     filter_by_age_exclude, 'Фильтр по возрасту')
 
 set_result_len_handler = QueryHandler(
-    QueryPattern([And('show')], 'NumArgument'),
+    QueryPattern([Or('show'), OrMulti([And('po'), AndMulti([Or('result'), Or('artist')])])], 'NumArgument'),
     set_result_len, 'Изменить количество выводимых результатов')
 
 filter_by_members_count_handler = QueryHandler(
