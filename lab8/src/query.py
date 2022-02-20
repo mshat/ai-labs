@@ -73,6 +73,10 @@ class Query:
         self._arguments.remove(arg)
 
     @property
+    def raw_sentence(self):
+        return self._raw_sentence
+
+    @property
     def keywords(self):
         return [word for word in self._words if isinstance(word, Placeholder) or word.tag]
 

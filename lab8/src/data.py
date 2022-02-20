@@ -31,6 +31,8 @@ keywords = {
     'number': ('количество',),
 
     'restart': ('вернуться', 'начало', 'новый', 'начать', 'заново'),
+
+    'filter': ('фильтр', 'ограничение',)
 }
 
 # for tag1, aliases1 in keywords.items():

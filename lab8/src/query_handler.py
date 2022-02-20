@@ -78,12 +78,12 @@ class QueryHandler:
         return res
 
     def remove_used_keywords_and_args(self, query: Query):
-        print(f'!!!!!!!! BEFOIRE {query}')
+        # print(f'!!!!!!!! BEFOIRE {query}')
         for word in self.used_keywords:
             query.remove_word(word)
         for arg in self.used_args:
             query.remove_argument(arg)
-        print(f'!!!!!!!!!! AFTER {query}')
+        # print(f'!!!!!!!!!! AFTER {query}')
 
     def __str__(self):
         return f'Запрос: {self.debug_msg.ljust(46)} | Паттерн: {self.pattern}'

@@ -107,8 +107,8 @@ class TestIntegrationStates(unittest.TestCase):
             'disallowed': disallowed_sentences,
         }
 
-        for allowed_disallowed, sentences in sentences.items():
-            for expected_res, sentence in sentences.items():
+        for allowed_disallowed, sentences_ in sentences.items():
+            for expected_res, sentence in sentences_.items():
                 with self.subTest(i=expected_res):
                     query_solver.state = state
                     query = SentenceParser(sentence).parse(query_solver.state)
@@ -223,7 +223,8 @@ class TestIntegrationStates(unittest.TestCase):
 
         sentences = {
             'search_by_artist': "найди похожих исполнителей на крека",
-            'search_by_genre': "найди исполнителей в жанре грайм",
+            'show_all_artists': "все исполнители",
+            #'search_by_genre': "найди исполнителей в жанре грайм",
 
             'filter_by_sex_include': "оставь исполнителей мужского пола",
             'filter_by_members_count': "оставь только соло исполнителей",

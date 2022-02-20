@@ -88,7 +88,7 @@ def set_result_len(query: Query):
 def filter_by_sex_include(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     sex = get_arguments_by_type(query, 'SexArgument')[0]
-    print(f'Убрать всех, кроме {sex} пола')
+    # print(f'Убрать всех, кроме {sex} пола')
     return DialogState.filter
 
 
@@ -164,9 +164,9 @@ set_result_len_handler = QueryHandler(QueryPattern([AndCond('show')], 'NumArgume
 
 filter_by_members_count_handler = QueryHandler(QueryPattern([OrCond('group'), OrCond('solo'), OrCond('duet')]), filter_by_members_count, 'Фильтр по количеству участников коллектива')
 
-remove_filters_handler = QueryHandler(QueryPattern([AndCond('exclude'), AndCond('all')]), remove_filters, 'Удалить все фильтры')
+remove_filters_handler = QueryHandler(QueryPattern([AndCond('exclude'), AndCond('all'), AndCond('filter')]), remove_filters, 'Удалить все фильтры')
 
-remove_result_len_filter_handler = QueryHandler(QueryPattern([AndMulCond([OrCond('show'), OrCond('exclude'), OrCond('include')]), AndMulCond([OrCond('all'), OrCond('number')])]), remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
+remove_result_len_filter_handler = QueryHandler(QueryPattern([OrMulCond([AndCond('exclude'), AndCond('number')]), OrMulCond([AndMulCond([OrCond('show'), OrCond('include')]), AndCond('all')])]), remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
 
 exclude_dislike_handler = QueryHandler(
     QueryPattern([AndCond('dislike'), AndCond('exclude')]),

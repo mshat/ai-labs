@@ -22,9 +22,9 @@ class QuerySolver:
     def unknown(self, query: Query):
         print('Я не понял вопрос')
         if DEBUG:
-            print(f'[UNRECOGNIZED SENTENCE KEYWORDS] {query.arguments} {query.keywords} {query.words}')
+            print(f'[UNRECOGNIZED SENTENCE] {query.arguments} {query.keywords} {query.words}')
 
-    def match_patterns(self, handlers_: List[QueryHandler], query: Query):
+    def match_patterns(self, handlers_: List[QueryHandler], query: Query) -> str | None:
         for handler in handlers_:
             if handler.match_pattern(query):
                 self.state = handler.handle(query)
@@ -54,12 +54,15 @@ class QuerySolver:
 
     def match_search_patterns(self, query: Query):
         search_handlers = [
+            handlers.search_by_artist_handler,
             handlers.search_by_sex_handler,
             handlers.search_by_genre_handler,
-            handlers.search_by_artist_handler,
             handlers.show_all_handler,
         ]
-        return self.match_patterns(search_handlers, query)
+        res = self.match_patterns(search_handlers, query)
+        if query.query_tag_structure:
+            self.solve_multi_filters(query)
+        return res
 
     def match_info_patterns(self, query: Query):
         info_handlers = [
@@ -67,7 +70,7 @@ class QuerySolver:
         ]
         return self.match_patterns(info_handlers, query)
 
-    def match_filter_patterns(self, query: Query):
+    def match_filter_patterns(self, query: Query) -> str | None:
         filter_handlers = [
             handlers.filter_by_sex_include_handler,
             handlers.filter_by_sex_exclude_handler,
@@ -80,12 +83,24 @@ class QuerySolver:
         ]
         return self.match_patterns(filter_handlers, query)
 
+    def solve_multi_filters(self, query: Query):
+        last_res = None
+        while True:
+            res = self.match_filter_patterns(query)
+            if res is None:
+                break
+            else:
+                last_res = res
+
+        return last_res
+
     def solve(self, query: Query):
         res = self.match_restart_patterns(query)
         if res: return res
 
         if self.state in (DialogState.search, DialogState.filter, DialogState.count_filter):
             res = self.match_filter_patterns(query)
+            # res = self.solve_multi_filters(query)
             if res:
                 return res
             else:

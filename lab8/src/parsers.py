@@ -2,7 +2,6 @@ import re
 from typing import List, Dict, ClassVar, Union
 from morph_nalyzer import MorphAnalyzer
 from word import BaseWord, Placeholder, Word
-from string_cleaner import StrCleaner
 from query import (ArtistArgumentError, GenreArgumentError, ArgumentError, Argument, ArtistArgument, SexArgument,
                    GenreArgument, StrArgument, NumArgument, ARTISTS, GENRES, Query)
 from word_classifier import WORD_CLASSIFIER
