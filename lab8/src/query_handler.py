@@ -1,4 +1,4 @@
-from typing import List, Callable, Tuple
+from typing import List, Callable, Tuple, Dict
 from query import Query, Word, Argument
 from tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
 from config import SHOW_QUERY_PATTERNS, DEBUG
@@ -17,11 +17,14 @@ class QueryPattern:
     def __init__(
             self,
             conditions: List[AndTagCondition | OrTagCondition | AndMultiTagCondition | OrMultiTagCondition],
-            required_argument_type: str = None
+            required_argument_type: str = None,
+            required_arguments: Dict[str, int] = None,
     ):
         self.pattern_matcher = PatternMatcher(conditions)
         self.conditions = conditions
         self.required_argument_type = required_argument_type
+        self.required_arguments = required_arguments
+        assert not (required_argument_type and required_arguments)
 
     def match(self, query: Query) -> Tuple[bool, List[Word], List[Argument]]:
         query_tag_structure = query.query_tag_structure
@@ -32,9 +35,16 @@ class QueryPattern:
         if self.required_argument_type:
             if self.required_argument_type in query.arguments:
                 res = True
-                used_args = query.arguments[self.required_argument_type]
+                used_args = query.arguments[self.required_argument_type][:1]
             else:
                 res = False
+
+        if self.required_arguments:
+            for arg_type, num in self.required_arguments.items():
+                if arg_type in query.arguments:
+                    if len(query.arguments[arg_type]) >= num:
+                        res = True
+                        used_args = query.arguments[arg_type][:num]
 
         match_res, used_words = self.pattern_matcher.match_pattern(query_tag_structure)
         if match_res:

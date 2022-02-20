@@ -47,6 +47,7 @@ class QuerySolver:
     def match_number_query_patterns(self, query: Query):
         number_query_handlers = [
             handlers.number_with_sex_handler,
+            handlers.number_with_age_range_handler,
             handlers.number_with_age_handler,
             handlers.number_handler,
         ]
@@ -75,8 +76,10 @@ class QuerySolver:
         filter_handlers = [
             handlers.filter_by_sex_include_handler,
             handlers.filter_by_sex_exclude_handler,
+            handlers.filter_by_age_range_handler,
             handlers.filter_by_age_exclude_handler,
             handlers.filter_by_age_include_handler,
+
             handlers.set_result_len_handler,
             handlers.filter_by_members_count_handler,
             handlers.remove_filters_handler,

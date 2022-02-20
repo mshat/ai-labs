@@ -1,5 +1,5 @@
-from query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as AndCond, OrTagCondition as OrCond,
-                           AndMultiTagCondition as AndMulCond, OrMultiTagCondition as OrMulCond)
+from query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as And, OrTagCondition as Or,
+                           AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti)
 from dialog_state import DialogState
 from query_handler import log_query_pattern_strings
 
@@ -65,23 +65,34 @@ def number_with_sex(query: Query):
     return DialogState.number
 
 
-def number_with_age(query: Query):
+def number_with_age_range(query: Query):
     allowed_states = (DialogState.number, DialogState.search, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) == 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
         print(f'количество артистов от {from_age} до {to_age} лет')
     else:
-        if 'younger' in query.query_tag_structure:
-            print(f'количество артистов до {age} лет')
-        elif 'older' in query.query_tag_structure:
-            print(f'количество артистов от {age} лет')
+        return
+    return DialogState.number
+
+
+def number_with_age(query: Query):
+    allowed_states = (DialogState.number, DialogState.search, DialogState.start)
+    age = get_arguments_by_type(query, 'NumArgument')
+    if len(age) == 2:
+        age = age[0]
+
+    if 'younger' in query.query_tag_structure:
+        print(f'количество артистов до {age} лет')
+    elif 'older' in query.query_tag_structure:
+        print(f'количество артистов от {age} лет')
     return DialogState.number
 
 
 def set_result_len(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     result_len = get_arguments_by_type(query, 'NumArgument')
+    print(f'Выводить по {result_len} строк')
     return DialogState.count_filter
 
 
@@ -99,31 +110,38 @@ def filter_by_sex_exclude(query: Query):
     return DialogState.filter
 
 
-def filter_by_age_include(query: Query):
+def filter_by_age_range(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) == 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
         print(f'фильтр от {from_age} до {to_age} лет')
     else:
-        if 'younger' in query.query_tag_structure:
-            print(f'фильтр до {age} лет')
-        elif 'older' in query.query_tag_structure:
-            print(f'фильтр от {age} лет')
+        return
+    return DialogState.filter
+
+
+def filter_by_age_include(query: Query):
+    allowed_states = (DialogState.filter, DialogState.start)
+    age = get_arguments_by_type(query, 'NumArgument')
+    if len(age) > 1:
+        age = age[0]
+    if 'younger' in query.query_tag_structure:
+        print(f'фильтр до {age} лет')
+    elif 'older' in query.query_tag_structure:
+        print(f'фильтр от {age} лет')
     return DialogState.filter
 
 
 def filter_by_age_exclude(query: Query):
     allowed_states = (DialogState.filter, DialogState.start)
     age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) == 2:
-        from_age, to_age = sorted(age)
-        print(f'фильтр от {from_age} до {to_age} лет')
-    else:
-        if 'younger' in query.query_tag_structure:
-            print(f'фильтр от {age} лет')
-        elif 'older' in query.query_tag_structure:
-            print(f'фильтр до {age} лет')
+    if len(age) > 1:
+        age = age[0]
+    if 'younger' in query.query_tag_structure:
+        print(f'фильтр от {age} лет')
+    elif 'older' in query.query_tag_structure:
+        print(f'фильтр до {age} лет')
     return DialogState.filter
 
 
@@ -151,95 +169,107 @@ def remove_filters(query: Query):
 
 
 restart_handler = QueryHandler(
-    QueryPattern([AndCond('restart')]),
+    QueryPattern([And('restart')]),
     restart, 'Рестарт')
 
 filter_by_sex_include_handler = QueryHandler(
-    QueryPattern([OrCond('include'), OrCond('artist')], 'SexArgument'),
+    QueryPattern([Or('include'), Or('artist')], 'SexArgument'),
     filter_by_sex_include, 'Фильтр по полу')
 
 filter_by_sex_exclude_handler = QueryHandler(
-    QueryPattern([OrCond('exclude'), OrCond('artist')], 'SexArgument'),
+    QueryPattern([Or('exclude'), Or('artist')], 'SexArgument'),
     filter_by_sex_exclude, 'Фильтр по полу')
 
-# filter_by_age_include_handler = QueryHandler(QueryPattern([AndCond('include'), AndMulCond([OrCond('older'), OrCond('younger')])]), filter_by_age_include, 'Фильтр по возрасту')
+# filter_by_age_include_handler = QueryHandler(QueryPattern([And('include'), AndMulti([Or('older'), Or('younger')])]), filter_by_age_include, 'Фильтр по возрасту')
+
+filter_by_age_range_handler = QueryHandler(
+    QueryPattern([Or('range'), OrMulti([And('older'), And('younger')])], required_arguments={'NumArgument': 2}),
+    filter_by_age_range, 'Фильтр по возрасту в диапазоне')
 
 filter_by_age_include_handler = QueryHandler(
-    QueryPattern([AndMulCond([OrCond('older'), OrCond('younger')])], 'NumArgument'),
+    QueryPattern([AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
     filter_by_age_include, 'Фильтр по возрасту')
 
 filter_by_age_exclude_handler = QueryHandler(
-    QueryPattern([AndCond('exclude'), AndMulCond([OrCond('older'), OrCond('younger')])], 'NumArgument'),
+    QueryPattern([And('exclude'), AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
     filter_by_age_exclude, 'Фильтр по возрасту')
 
 set_result_len_handler = QueryHandler(
-    QueryPattern([AndCond('show')], 'NumArgument'),
+    QueryPattern([And('show')], 'NumArgument'),
     set_result_len, 'Изменить количество выводимых результатов')
 
 filter_by_members_count_handler = QueryHandler(
-    QueryPattern([OrCond('group'), OrCond('solo'), OrCond('duet')]),
+    QueryPattern([Or('group'), Or('solo'), Or('duet')]),
     filter_by_members_count, 'Фильтр по количеству участников коллектива')
 
 remove_filters_handler = QueryHandler(
-    QueryPattern([AndCond('exclude'), AndCond('all'), AndCond('filter')]),
+    QueryPattern([And('exclude'), And('all'), And('filter')]),
     remove_filters, 'Удалить все фильтры')
 
 remove_result_len_filter_handler = QueryHandler(
     QueryPattern([
-        OrMulCond([AndCond('exclude'), AndCond('number')]),
-        OrMulCond([AndMulCond([OrCond('show'), OrCond('include')]), AndCond('all')])
+        OrMulti([And('exclude'), And('number')]),
+        OrMulti([AndMulti([Or('show'), Or('include')]), And('all')])
     ]),
     remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
 
 exclude_dislike_handler = QueryHandler(
-    QueryPattern([AndCond('dislike'), AndCond('exclude')]),
+    QueryPattern([And('dislike'), And('exclude')]),
     like, 'Лайк')
 
 exclude_like_handler = QueryHandler(
-    QueryPattern([AndCond('like'), AndCond('exclude')]),
+    QueryPattern([And('like'), And('exclude')]),
     dislike, 'Дизлайк')
 
 like_handler = QueryHandler(
-    QueryPattern([AndCond('like')]),
+    QueryPattern([And('like')]),
     like, 'Лайк')
 
 dislike_handler = QueryHandler(
-    QueryPattern([AndCond('dislike')]),
+    QueryPattern([And('dislike')]),
     dislike, 'Дизлайк')
 
 number_with_sex_handler = QueryHandler(
-    QueryPattern([OrCond('number'), OrCond('how many')], 'SexArgument'),
+    QueryPattern([Or('number'), Or('how many')], 'SexArgument'),
     number_with_sex, 'Количество артистов указанного пола в базе')
+
+number_with_age_range_handler = QueryHandler(
+    QueryPattern(
+        #[AndMulti([Or('number'), Or('how many')]), AndMulti([Or('older'), Or('younger')])],
+        [AndMulti([Or('number'), Or('how many')]), AndMulti([Or('range'), OrMulti([And('older'), And('younger')])])],
+        required_arguments={'NumArgument': 2}
+    ),
+    number_with_age_range, 'Количество артистов от X до Y лет в базе')
 
 number_with_age_handler = QueryHandler(
     QueryPattern(
-        [AndMulCond([OrCond('number'), OrCond('how many')]), AndMulCond([OrCond('older'), OrCond('younger')])],
+        [AndMulti([Or('number'), Or('how many')]), AndMulti([Or('older'), Or('younger')])],
         'NumArgument'
     ),
     number_with_age, 'Количество артистов указанного возраста в базе')
 
 number_handler = QueryHandler(
-    QueryPattern([OrCond('number'), OrCond('how many')]),
+    QueryPattern([Or('number'), Or('how many')]),
     number, 'Количество артистов в базе')
 
 search_by_sex_handler = QueryHandler(
-    QueryPattern([OrCond('artist'), OrCond('recommend')], 'SexArgument'),
+    QueryPattern([Or('artist'), Or('recommend')], 'SexArgument'),
     search_by_sex, 'Вывести исполнителей указанного пола')
 
 search_by_genre_handler = QueryHandler(
-    QueryPattern([OrCond('genre'), OrCond('recommend')], 'GenreArgument'),
+    QueryPattern([Or('genre'), Or('recommend')], 'GenreArgument'),
     search_by_genre, 'Вывести артистов в определённом жанре')
 
 search_by_artist_handler = QueryHandler(
-    QueryPattern([OrCond('search'), OrCond('recommend')], 'ArtistArgument'),
+    QueryPattern([Or('search'), Or('recommend')], 'ArtistArgument'),
     search_by_artist, 'Рекомендация по артисту')
 
 show_all_handler = QueryHandler(
-    QueryPattern([AndCond('all'), AndMulCond([OrCond('include'), OrCond('artist')])]),
+    QueryPattern([And('all'), AndMulti([Or('include'), Or('artist')])]),
     show_all_artists, 'Вывести всех артистов в базе')
 
 info_handler = QueryHandler(
-    QueryPattern([OrCond('talk about'), OrCond('about'), OrCond('info')], 'ArtistArgument'),
+    QueryPattern([Or('talk about'), Or('about'), Or('info')], 'ArtistArgument'),
     info, 'Информация об артисте')
 
 
