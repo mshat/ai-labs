@@ -8,14 +8,14 @@ class TestTagSimpleCondition(unittest.TestCase):
     tags = {'search': None}
 
     def test_tag_condition_pos(self):
-        condition = TagCondition('search')
+        condition = AndTagCondition('search')
 
         res = condition.solve(self.tags)
 
         self.assertTrue(res)
 
     def test_tag_condition_neg(self):
-        condition = TagCondition('artist')
+        condition = AndTagCondition('artist')
 
         res = condition.solve(self.tags)
 

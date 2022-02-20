@@ -1,7 +1,8 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from data import keywords
+from query import Word
 
 
 class PatternMatcher:  # TODO как-то вынести в отдельный модуль, разрешив циклический импорт
@@ -11,30 +12,33 @@ class PatternMatcher:  # TODO как-то вынести в отдельный �
     ):
         self.conditions = conditions
 
-    def match_pattern(self, query_tag_structure: dict) -> bool:
-        res = None
+    def match_pattern(self, query_tag_structure: dict) -> Tuple[bool, List[Word]]:
+        match_res = None
+        all_used_words = []
 
         for condition in self.conditions:
+            res, used_words = condition.solve(query_tag_structure)
+            if res:
+                all_used_words += used_words
             if isinstance(condition, AndTagCondition) or isinstance(condition, AndMultiTagCondition):
-                if res is None:
-                    res = condition.solve(query_tag_structure)
+                if match_res is None:
+                    match_res = res
                 else:
-                    res *= condition.solve(query_tag_structure)
+                    match_res *= res
             elif isinstance(condition, OrTagCondition) or isinstance(condition, OrMultiTagCondition):
-                if res is None:
-                    res = condition.solve(query_tag_structure)
+                if match_res is None:
+                    match_res = res
                 else:
-                    res += condition.solve(query_tag_structure)
-        return res
+                    match_res += res
+            else:
+                raise Exception('Unknown condition!')
+
+        if match_res is None:
+            match_res = False
+        return match_res, all_used_words
 
 
-class BaseTagCondition(ABC):
-    @abstractmethod
-    def solve(self, query_tag_structure: Dict) -> bool:
-        pass
-
-
-class TagCondition(BaseTagCondition):
+class TagCondition(ABC):
     """
     Условие - составная часть паттерна запроса.
     Инициализируется тэгом, который должен быть найден в запросе, чтобы паттерн подошел к запросу
@@ -44,11 +48,11 @@ class TagCondition(BaseTagCondition):
         assert tag in keywords
         self.tag = tag
 
-    def solve(self, query_tag_structure: Dict):
+    def solve(self, query_tag_structure: Dict) -> Tuple[bool, List[Word]]:
         if self.tag in query_tag_structure:
-            return True
+            return True, query_tag_structure[self.tag]
         else:
-            return False
+            return False, []
 
 
 class AndTagCondition(TagCondition):
@@ -75,18 +79,26 @@ class OrTagCondition(TagCondition):
         return self.__str__()
 
 
-class MultiTagCondition(BaseTagCondition):
+class MultiTagCondition(ABC):
     """
     Составное условие - составная часть паттерна запроса.
+    При инициализации получает объекты-условия.
+    Результатом вызова метода solve будет результат вычисления условий self.conditions
     """
 
     def __init__(self, conditions: List[AndTagCondition | OrTagCondition]):
         self.pattern_matcher = PatternMatcher(conditions)
         self.conditions = conditions
 
-    def solve(self, query_tag_structure: Dict) -> bool:
+    def solve(self, query_tag_structure: Dict) -> Tuple[bool, List[Word]]:
         res = self.pattern_matcher.match_pattern(query_tag_structure)
-        return res if res else False
+        return res
+
+    def __str__(self):
+        conditions = ' '.join([str(condition) for condition in self.conditions])
+        conditions_without_first_word = conditions.split()[1:]
+        conditions = ' '.join(conditions_without_first_word)
+        return conditions
 
 
 class AndMultiTagCondition(MultiTagCondition):
@@ -95,9 +107,7 @@ class AndMultiTagCondition(MultiTagCondition):
     Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
     """
     def __str__(self):
-        conditions = ' '.join([str(condition) for condition in self.conditions])
-        conditions_without_first_word = conditions.split()[1:]
-        conditions = ' '.join(conditions_without_first_word)
+        conditions = super(AndMultiTagCondition, self).__str__()
         return f'AND ({conditions})'
 
     def __repr__(self):
@@ -110,9 +120,7 @@ class OrMultiTagCondition(MultiTagCondition):
     Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом
     """
     def __str__(self):
-        conditions = ' '.join([str(condition) for condition in self.conditions])
-        conditions_without_first_word = conditions.split()[1:]
-        conditions = ' '.join(conditions_without_first_word)
+        conditions = super(OrMultiTagCondition, self).__str__()
         return f'OR ({conditions})'
 
     def __repr__(self):

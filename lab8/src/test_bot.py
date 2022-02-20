@@ -39,11 +39,11 @@ class DataForTests:
         "все исполнители": 'show_all_artists',
     }
     test_filter = {
-        "оставь исполнителей мужского пола": 'filter_by_sex',
-        "оставь женщин": 'filter_by_sex',
-        "убери женщин": 'filter_by_sex',
-        "выбери женщин": 'filter_by_sex',
-        "убери всех исполнителей кроме женского пола": 'filter_by_sex',
+        "оставь исполнителей мужского пола": 'filter_by_sex_include',
+        "оставь женщин": 'filter_by_sex_include',
+        "убери женщин": 'filter_by_sex_exclude',
+        "выбери женщин": 'filter_by_sex_include',
+        "убери всех исполнителей кроме женского пола": 'filter_by_sex_include',
         "оставь только соло исполнителей": 'filter_by_members_count',
         "убери всех кроме соло исполнителей": 'filter_by_members_count',
         "оставь только дуэты": 'filter_by_members_count',
@@ -136,7 +136,7 @@ class TestIntegrationStates(unittest.TestCase):
     def test_next_states_search(self):
         """ Проверяет в какие состояния можно перейти из состояния search"""
         allowed = {
-            'filter_by_sex': "оставь исполнителей мужского пола",
+            'filter_by_sex_include': "оставь исполнителей мужского пола",
             'like': "убери моргенштерна из списка дизлайков",
             'number': "сколько исполнителей в базе?",
             'info': "информация о касте"
@@ -150,7 +150,7 @@ class TestIntegrationStates(unittest.TestCase):
     def test_next_states_filter(self):
         """ Проверяет в какие состояния можно перейти из состояния filter"""
         allowed = {
-            'filter_by_sex': "оставь исполнителей мужского пола",
+            'filter_by_sex_include': "оставь исполнителей мужского пола",
             'like': "убери моргенштерна из списка дизлайков",
             'number': "сколько исполнителей в базе?",
             'info': "информация о касте"
@@ -225,7 +225,7 @@ class TestIntegrationStates(unittest.TestCase):
             'search_by_artist': "найди похожих исполнителей на крека",
             'search_by_genre': "найди исполнителей в жанре грайм",
 
-            'filter_by_sex': "оставь исполнителей мужского пола",
+            'filter_by_sex_include': "оставь исполнителей мужского пола",
             'filter_by_members_count': "оставь только соло исполнителей",
 
             'like': "убери моргенштерна из списка дизлайков",
@@ -254,7 +254,7 @@ class TestIntegrationStates(unittest.TestCase):
         sentences = {
             'search_by_artist': "найди похожих исполнителей на крека",
 
-            'filter_by_sex': "оставь исполнителей мужского пола",
+            'filter_by_sex_include': "оставь исполнителей мужского пола",
 
             'like': "убери моргенштерна из списка дизлайков",
 
