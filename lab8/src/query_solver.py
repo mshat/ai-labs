@@ -60,8 +60,9 @@ class QuerySolver:
             handlers.show_all_handler,
         ]
         res = self.match_patterns(search_handlers, query)
-        if query.query_tag_structure:
-            self.solve_multi_filters(query)
+        if res:
+            if query.query_tag_structure:
+                self.solve_multi_filters(query)
         return res
 
     def match_info_patterns(self, query: Query):
@@ -74,8 +75,8 @@ class QuerySolver:
         filter_handlers = [
             handlers.filter_by_sex_include_handler,
             handlers.filter_by_sex_exclude_handler,
-            handlers.filter_by_age_include_handler,
             handlers.filter_by_age_exclude_handler,
+            handlers.filter_by_age_include_handler,
             handlers.set_result_len_handler,
             handlers.filter_by_members_count_handler,
             handlers.remove_filters_handler,
@@ -100,7 +101,6 @@ class QuerySolver:
 
         if self.state in (DialogState.search, DialogState.filter, DialogState.count_filter):
             res = self.match_filter_patterns(query)
-            # res = self.solve_multi_filters(query)
             if res:
                 return res
             else:

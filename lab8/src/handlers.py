@@ -150,23 +150,46 @@ def remove_filters(query: Query):
     return DialogState.filter
 
 
-restart_handler = QueryHandler(QueryPattern([AndCond('restart')]), restart, 'Рестарт')
+restart_handler = QueryHandler(
+    QueryPattern([AndCond('restart')]),
+    restart, 'Рестарт')
 
-filter_by_sex_include_handler = QueryHandler(QueryPattern([OrCond('include'), OrCond('artist')], 'SexArgument'), filter_by_sex_include, 'Фильтр по полу')
+filter_by_sex_include_handler = QueryHandler(
+    QueryPattern([OrCond('include'), OrCond('artist')], 'SexArgument'),
+    filter_by_sex_include, 'Фильтр по полу')
 
-filter_by_sex_exclude_handler = QueryHandler(QueryPattern([OrCond('exclude'), OrCond('artist')], 'SexArgument'), filter_by_sex_exclude, 'Фильтр по полу')
+filter_by_sex_exclude_handler = QueryHandler(
+    QueryPattern([OrCond('exclude'), OrCond('artist')], 'SexArgument'),
+    filter_by_sex_exclude, 'Фильтр по полу')
 
-filter_by_age_include_handler = QueryHandler(QueryPattern([AndCond('include'), AndMulCond([OrCond('older'), OrCond('younger')])]), filter_by_age_include, 'Фильтр по возрасту')
+# filter_by_age_include_handler = QueryHandler(QueryPattern([AndCond('include'), AndMulCond([OrCond('older'), OrCond('younger')])]), filter_by_age_include, 'Фильтр по возрасту')
 
-filter_by_age_exclude_handler = QueryHandler(QueryPattern([AndCond('exclude'), AndMulCond([OrCond('older'), OrCond('younger')])]), filter_by_age_exclude, 'Фильтр по возрасту')
+filter_by_age_include_handler = QueryHandler(
+    QueryPattern([AndMulCond([OrCond('older'), OrCond('younger')])], 'NumArgument'),
+    filter_by_age_include, 'Фильтр по возрасту')
 
-set_result_len_handler = QueryHandler(QueryPattern([AndCond('show')], 'NumArgument'), set_result_len, 'Изменить количество выводимых результатов')
+filter_by_age_exclude_handler = QueryHandler(
+    QueryPattern([AndCond('exclude'), AndMulCond([OrCond('older'), OrCond('younger')])], 'NumArgument'),
+    filter_by_age_exclude, 'Фильтр по возрасту')
 
-filter_by_members_count_handler = QueryHandler(QueryPattern([OrCond('group'), OrCond('solo'), OrCond('duet')]), filter_by_members_count, 'Фильтр по количеству участников коллектива')
+set_result_len_handler = QueryHandler(
+    QueryPattern([AndCond('show')], 'NumArgument'),
+    set_result_len, 'Изменить количество выводимых результатов')
 
-remove_filters_handler = QueryHandler(QueryPattern([AndCond('exclude'), AndCond('all'), AndCond('filter')]), remove_filters, 'Удалить все фильтры')
+filter_by_members_count_handler = QueryHandler(
+    QueryPattern([OrCond('group'), OrCond('solo'), OrCond('duet')]),
+    filter_by_members_count, 'Фильтр по количеству участников коллектива')
 
-remove_result_len_filter_handler = QueryHandler(QueryPattern([OrMulCond([AndCond('exclude'), AndCond('number')]), OrMulCond([AndMulCond([OrCond('show'), OrCond('include')]), AndCond('all')])]), remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
+remove_filters_handler = QueryHandler(
+    QueryPattern([AndCond('exclude'), AndCond('all'), AndCond('filter')]),
+    remove_filters, 'Удалить все фильтры')
+
+remove_result_len_filter_handler = QueryHandler(
+    QueryPattern([
+        OrMulCond([AndCond('exclude'), AndCond('number')]),
+        OrMulCond([AndMulCond([OrCond('show'), OrCond('include')]), AndCond('all')])
+    ]),
+    remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
 
 exclude_dislike_handler = QueryHandler(
     QueryPattern([AndCond('dislike'), AndCond('exclude')]),
@@ -176,25 +199,48 @@ exclude_like_handler = QueryHandler(
     QueryPattern([AndCond('like'), AndCond('exclude')]),
     dislike, 'Дизлайк')
 
-like_handler = QueryHandler(QueryPattern([AndCond('like')]), like, 'Лайк')
+like_handler = QueryHandler(
+    QueryPattern([AndCond('like')]),
+    like, 'Лайк')
 
-dislike_handler = QueryHandler(QueryPattern([AndCond('dislike')]), dislike, 'Дизлайк')
+dislike_handler = QueryHandler(
+    QueryPattern([AndCond('dislike')]),
+    dislike, 'Дизлайк')
 
-number_with_sex_handler = QueryHandler(QueryPattern([OrCond('number'), OrCond('how many')], 'SexArgument'), number_with_sex, 'Количество артистов указанного пола в базе')
+number_with_sex_handler = QueryHandler(
+    QueryPattern([OrCond('number'), OrCond('how many')], 'SexArgument'),
+    number_with_sex, 'Количество артистов указанного пола в базе')
 
-number_with_age_handler = QueryHandler(QueryPattern([AndMulCond([OrCond('number'), OrCond('how many')]), AndMulCond([OrCond('older'), OrCond('younger')])], 'NumArgument'), number_with_age, 'Количество артистов указанного возраста в базе')
+number_with_age_handler = QueryHandler(
+    QueryPattern(
+        [AndMulCond([OrCond('number'), OrCond('how many')]), AndMulCond([OrCond('older'), OrCond('younger')])],
+        'NumArgument'
+    ),
+    number_with_age, 'Количество артистов указанного возраста в базе')
 
-number_handler = QueryHandler(QueryPattern([OrCond('number'), OrCond('how many')]), number, 'Количество артистов в базе')
+number_handler = QueryHandler(
+    QueryPattern([OrCond('number'), OrCond('how many')]),
+    number, 'Количество артистов в базе')
 
-search_by_sex_handler = QueryHandler(QueryPattern([OrCond('artist'), OrCond('recommend')], 'SexArgument'), search_by_sex, 'Вывести исполнителей указанного пола')
+search_by_sex_handler = QueryHandler(
+    QueryPattern([OrCond('artist'), OrCond('recommend')], 'SexArgument'),
+    search_by_sex, 'Вывести исполнителей указанного пола')
 
-search_by_genre_handler = QueryHandler(QueryPattern([OrCond('genre'), OrCond('recommend')], 'GenreArgument'), search_by_genre, 'Вывести артистов в определённом жанре')
+search_by_genre_handler = QueryHandler(
+    QueryPattern([OrCond('genre'), OrCond('recommend')], 'GenreArgument'),
+    search_by_genre, 'Вывести артистов в определённом жанре')
 
-search_by_artist_handler = QueryHandler(QueryPattern([OrCond('search'), OrCond('recommend')], 'ArtistArgument'), search_by_artist, 'Рекомендация по артисту')
+search_by_artist_handler = QueryHandler(
+    QueryPattern([OrCond('search'), OrCond('recommend')], 'ArtistArgument'),
+    search_by_artist, 'Рекомендация по артисту')
 
-show_all_handler = QueryHandler(QueryPattern([AndCond('all'), AndMulCond([OrCond('include'), OrCond('artist')])]), show_all_artists, 'Вывести всех артистов в базе')
+show_all_handler = QueryHandler(
+    QueryPattern([AndCond('all'), AndMulCond([OrCond('include'), OrCond('artist')])]),
+    show_all_artists, 'Вывести всех артистов в базе')
 
-info_handler = QueryHandler(QueryPattern([OrCond('talk about'), OrCond('about'), OrCond('info')], 'ArtistArgument'), info, 'Информация об артисте')
+info_handler = QueryHandler(
+    QueryPattern([OrCond('talk about'), OrCond('about'), OrCond('info')], 'ArtistArgument'),
+    info, 'Информация об артисте')
 
 
 if __name__ == "__main__":
