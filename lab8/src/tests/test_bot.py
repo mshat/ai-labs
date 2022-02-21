@@ -1,6 +1,6 @@
 import unittest
-from query_solver import QuerySolver, DialogState
-from parsers import SentenceParser
+from lab8.src.query_solver import QuerySolver, DialogState
+from lab8.src.parsers import SentenceParser
 
 
 class DataForTests:
