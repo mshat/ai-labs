@@ -1,8 +1,8 @@
 from typing import Callable, Tuple, Dict
 import PySimpleGUI as sg
-import interface
-import filter
-from data.artists import ARTISTS
+from lab5.src.recommender_system import filter
+from lab5.src.recommender_system import interface
+from lab5.src.recommender_system.data.artists import ARTISTS
 
 artists_list = reversed(ARTISTS)
 artists_list = [artist.ljust(18) for artist in artists_list]

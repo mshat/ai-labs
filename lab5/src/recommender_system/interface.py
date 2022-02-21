@@ -1,15 +1,14 @@
-import random
+import os
 from collections import OrderedDict
-from recommendation_list import get_recommendations
-from recommendation_list import (
+from lab5.src.recommender_system.recommendation_list import get_recommendations
+from lab5.src.recommender_system.recommendation_list import (
     Node, create_tree_from_json, load_artist_pairs_proximity_json, calc_max_general_proximity,
     calc_min_general_proximity, normalize_proximities)
-from proximity_measures import generalizing_proximity_measure
-from tree.tree_tools import calc_max_distance_between_nodes
-from tree.genre_node import GenreVisualNode
+from lab5.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes
+from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
 
-
-TREE = create_tree_from_json('data/genres.json')
+dir_path = os.path.dirname(os.path.realpath(__file__))
+TREE = create_tree_from_json(f'{dir_path}/data/genres.json')
 ARTIST_PAIRS_PROXIMITY = load_artist_pairs_proximity_json()
 max_proximity = calc_max_general_proximity(ARTIST_PAIRS_PROXIMITY)
 min_proximity = calc_min_general_proximity(ARTIST_PAIRS_PROXIMITY)

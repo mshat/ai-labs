@@ -1,17 +1,20 @@
+import os
 import json
 from collections import OrderedDict
-from tree.visual_node import Node
-from tree.tree_tools import calc_max_distance_between_nodes
-from tree.tree_loader import create_tree_from_json
-from tree.genre_node import GenreVisualNode
-from proximity_measures import (
+from lab5.src.recommender_system.tree.visual_node import Node
+from lab5.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes
+from lab5.src.recommender_system.tree.tree_loader import create_tree_from_json
+from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
+from lab5.src.recommender_system.proximity_measures import (
     calc_generalizing_proximity_measure_for_all_leafs,
     calc_max_general_proximity,
     calc_min_general_proximity,
     normalize_proximities
 )
-from tools import format_print
-from config import MIN_SIMILARITY_PROXIMITY
+from lab5.src.recommender_system.tools import format_print
+from lab5.src.recommender_system.config import MIN_SIMILARITY_PROXIMITY
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 def create_artist_pairs_proximity_json(tree):
@@ -21,7 +24,7 @@ def create_artist_pairs_proximity_json(tree):
         json.dump(artist_pairs_proximity, file)
 
 
-def load_artist_pairs_proximity_json(filename: str = 'data/artist_pairs_proximity.json') -> dict:
+def load_artist_pairs_proximity_json(filename: str = f'{dir_path}/data/artist_pairs_proximity.json') -> dict:
     with open(filename, 'r') as file:
         return json.load(file)
 

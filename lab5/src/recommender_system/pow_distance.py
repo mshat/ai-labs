@@ -1,6 +1,3 @@
-from tree.genre_node import VisualNode, GenreVisualNode
-
-
 def calc_distance_in_pow(attributes1: list[float], attributes2: list[float], power):
     distance = 0
     for i in range(len(attributes1)):
