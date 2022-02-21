@@ -4,7 +4,6 @@ from tree.visual_node import Node
 from tree.tree_tools import calc_max_distance_between_nodes
 from tree.tree_loader import create_tree_from_json
 from tree.genre_node import GenreVisualNode
-from proximity_measures import generalizing_proximity_measure
 from proximity_measures import (
     calc_generalizing_proximity_measure_for_all_leafs,
     calc_max_general_proximity,
@@ -12,7 +11,7 @@ from proximity_measures import (
     normalize_proximities
 )
 from tools import format_print
-from compare_measures import compare_measures
+from config import MIN_SIMILARITY_PROXIMITY
 
 
 def create_artist_pairs_proximity_json(tree):
@@ -35,28 +34,23 @@ def print_all_artist_pairs_proximity(artist_pairs_proximity: dict):
 
 def get_recommendations(
         seed_object: GenreVisualNode,
-        artist_pairs_proximity: dict,
-        max_len: int = None) -> OrderedDict:
+        artist_pairs_proximity: dict) -> OrderedDict:
     artist_pairs = artist_pairs_proximity[seed_object.name]
-    recommendations = OrderedDict(sorted(artist_pairs.items(), key=lambda item: item[1]))
-    if max_len:
-        limited_recommendations = OrderedDict()
-        i = 0
-        for key, val in recommendations.items():
-            if i >= max_len:
-                break
-            i += 1
-            limited_recommendations.update({key: val})
-        return limited_recommendations
+    artist_pairs_sorted_by_proximity = OrderedDict(sorted(artist_pairs.items(), key=lambda item: item[1]))
+
+    recommendations = OrderedDict()
+    for artist_name, proximity in artist_pairs_sorted_by_proximity.items():
+        if proximity <= MIN_SIMILARITY_PROXIMITY:
+            if artist_name not in recommendations:
+                recommendations[artist_name] = proximity
     return recommendations
 
 
 def show_recommendations(
         seed_object: GenreVisualNode,
         artist_pairs_proximity: dict,
-        max_len: int = None,
         show_proximity=False) -> None:
-    recommendations = get_recommendations(seed_object, artist_pairs_proximity, max_len)
+    recommendations = get_recommendations(seed_object, artist_pairs_proximity)
     # print(f'seed_object: {seed_object.name}')
     for recommendation_name, proximity in recommendations.items():
         if show_proximity:

@@ -1,5 +1,7 @@
+from typing import Callable, Tuple, Dict
 import PySimpleGUI as sg
 import interface
+import filter
 from data.artists import ARTISTS
 
 artists_list = reversed(ARTISTS)
@@ -7,7 +9,6 @@ artists_list = [artist.ljust(18) for artist in artists_list]
 available_artists1 = '\n'.join(list(artists_list[:30]))
 available_artists2 = '\n'.join(list(artists_list[30:]))
 
-EXCLUDE = ['sex', 'group_type', 'older', 'younger']
 
 # самые непохожие: noize mc лигалайз, alyona alyona каста, noize mc guf, noize mc баста, noize mc лигалайз
 # самые похожие: ram sid, баста guf, krec многоточие
@@ -16,7 +17,7 @@ layout = [
     [
         sg.Text('Рекомендация по затравочному значению', size=(39, 1)),
         sg.Radio(text='', group_id=0, default=True, key='_seed_radio_'),
-        sg.InputText(key='_seed_'),
+        sg.InputText(key='_seed_', default_text='кровосток'),
     ],
     [
         sg.Text('Рекомендация по списку лайков (через запятую)', size=(39, 1)),
@@ -57,55 +58,46 @@ layout = [
 ]
 
 
-def filter(filters, recommendations, exclude=None):
-    exclude = exclude if exclude else []
-    filtered_recommendations = []
-    group_type = filters['group_type']
-    sex = filters['sex']
-    older = int(filters['older']) if filters['older'] else None
-    younger = int(filters['younger']) if filters['younger'] else None
-    for artist_name, proximity in recommendations.items():
-        artist = interface.find_artist(artist_name)
-        if group_type != 'any' and artist.solo_duet_group != group_type and 'group_type' not in exclude:
-            continue
-        if sex != 'anysex' and artist.sex != sex and 'sex' not in exclude:
-            continue
-        if older and artist.age <= older and 'older' not in exclude:
-            continue
-        if younger and artist.age >= younger and 'younger' not in exclude:
-            continue
-        filtered_recommendations.append(artist_name)
-    return filtered_recommendations
-
-
-def parse_filters(values) -> dict:
-    filters = {}
-    for sex in ['_male_', '_female_', '_any_sex_']:
-        if values[sex]:
-            filters['sex'] = sex.replace('_', '')
-            break
-
-    for group_type in ['_solo_', '_duet_', '_group_', '_any_']:
-        if values[group_type]:
-            filters['group_type'] = group_type.replace('_', '')
-            break
-
-    filters['older'] = values['_older_']
-    filters['younger'] = values['_younger_']
-
-    return filters
-
-
-def print_recommendations(final_recommendation_artists, max_output_len):
-    for i, artist_name in enumerate(final_recommendation_artists):
+def print_recommendations(recommendations, max_output_len, debug=False):
+    for i, artist_name in enumerate(recommendations):
         if i < max_output_len:
-            # print(artist_name, final_recommendations[artist_name])
-            if show:
+            if debug:
+                print(artist_name, recommendations[artist_name])
+            else:
                 print(artist_name)
 
 
+def handle_command(
+        window,
+        values: Dict,
+        max_output_len: int,
+        clean: bool,
+        debug: bool,
+        recommend_handler: Callable,
+        handler_args: Tuple = tuple(),
+        handler_kwargs: Dict = None):
+    if clean:
+        window['_output_'].Update('')
+    try:
+        handler_kwargs = dict() if not handler_kwargs else handler_kwargs
+        recommendations = recommend_handler(*handler_args, **handler_kwargs)
+        filtered_recommendations = filter.filter_(filter.parse_filters(values), recommendations)
+        if not filtered_recommendations:
+            print('Не найдено точного соответствия, однако, возможно, вам понравится:')
+            filtered_recommendations = filter.loosen_filters(filtered_recommendations, values, recommendations)
+        print_recommendations(filtered_recommendations, max_output_len, debug)
+
+    except interface.ParseError as e:
+        print('Не могу разобрать аргументы')
+        print(e)
+    except interface.ArgumentError as e:
+        print(e)
+    except Exception as e:
+        print(f'Неизвестная ошибка: {e}')
+
+
 def show():
-    window = sg.Window('lab3', layout)
+    window = sg.Window('RK1', layout)
     while True:
         event, values = window.read()
         seed = values['_seed_']
@@ -125,68 +117,12 @@ def show():
             window['_disliked_'].Update('')
         if event == 'Рекомендовать':
             if seed_radio:
-                if clean:
-                    window['_output_'].Update('')
-                try:
-                    recommendations = interface.recommend_by_seed(seed, max_len)
-                    filtered_recommendations = filter(parse_filters(values), recommendations)
-                    if not filtered_recommendations:
-                        print('Не найдено точного соответствия, однако, возможно, Вам понравится:')
-                    i = 0
-                    exclude = []
-                    while not filtered_recommendations and i < len(EXCLUDE):
-                        exclude.append(EXCLUDE[i])
-                        filtered_recommendations = filter(parse_filters(values), recommendations, exclude=exclude)
-                        i += 1
-                    print_recommendations(filtered_recommendations, max_len)
-
-                except interface.ParseError as e:
-                    print('Не могу разобрать аргументы')
-                    print(e)
-                except interface.ArgumentError as e:
-                    print(e)
-                except Exception as e:
-                    print(f'Неизвестная ошибка: {e}')
+                handle_command(window, values, max_len, clean, debug, interface.recommend_by_seed, (seed,))
             elif use_disliked:
-                if clean:
-                    window['_output_'].Update('')
-                try:
-                    recommendations = interface.recommend_by_disliked(disliked, liked, max_len, debug)
-                    filtered_recommendations = filter(parse_filters(values), recommendations)
-                    if not filtered_recommendations:
-                        print('Не найдено точного соответствия, однако, возможно, Вам понравится:')
-                    i = 0
-                    exclude = []
-                    while not filtered_recommendations and i < len(EXCLUDE):
-                        exclude.append(EXCLUDE[i])
-                        filtered_recommendations = filter(parse_filters(values), recommendations, exclude=exclude)
-                        i += 1
-                    print_recommendations(filtered_recommendations, max_len)
-                except interface.ParseError:
-                    print('Не могу разобрать аргументы')
-                except Exception as e:
-                    print(f'Неизвестная ошибка: {e}')
+                handle_command(window, values, max_len, clean, debug,
+                               interface.recommend_by_liked_with_disliked, (disliked, liked, debug))
             elif liked_radio:
-                if clean:
-                    window['_output_'].Update('')
-                try:
-                    recommendations = interface.recommend_by_liked(liked, max_len)
-                    filtered_recommendations = filter(parse_filters(values), recommendations)
-                    if not filtered_recommendations:
-                        print('Не найдено точного соответствия, однако, возможно, Вам понравится:')
-                    i = 0
-                    exclude = []
-                    while not filtered_recommendations and i < len(EXCLUDE):
-                        exclude.append(EXCLUDE[i])
-                        filtered_recommendations = filter(parse_filters(values), recommendations, exclude=exclude)
-                        i += 1
-                    print_recommendations(filtered_recommendations, max_len)
-                except interface.ParseError:
-                    print('Не могу разобрать аргументы')
-                except interface.ArgumentError as e:
-                    print(e)
-                except Exception as e:
-                    print(f'Неизвестная ошибка: {e}')
-
+                handle_command(window, values, max_len, clean, debug, interface.recommend_by_liked, (liked,))
 
     window.close()
+

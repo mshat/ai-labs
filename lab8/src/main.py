@@ -7,9 +7,8 @@ if __name__ == '__main__':
     query_solver = QuerySolver()
     # query_solver.state = DialogState.search
 
-    sentence = "найди исполнителей мужского пола похожих на крека и выводи по 10 артистов"
-    sentence = "порекомендуй исполнителей мужского пола, похожих на касту и выводи по 10 результатов"
-    # sentence = "выводи всех"
+    sentence = "порекомендуй соло исполнителей мужского пола, в возрасте от 20 лет похожих на касту и выводи по 10 результатов"
+    # sentence = "покажи исполнителей мужчин и до 10 лет и от 20 до 40"
     query = SentenceParser(sentence).parse(query_solver.state)
     print(f'Вход: {query.raw_sentence}')
     # print(query.words)
