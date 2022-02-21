@@ -1,5 +1,5 @@
 import sys
-sys.path.append("../../..")
+sys.path.append("../..")
 from lab5.src.recommender_system.tree.node import Node
 from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
 
