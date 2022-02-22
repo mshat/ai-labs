@@ -32,6 +32,8 @@ def dislike(query: Query, user: User):
 
 
 def show_all_artists(query: Query, user: User):
+    artists = interface.get_all_artists()
+    interface.print_artists(artists)
     return DialogState.search
 
 
@@ -257,7 +259,7 @@ search_by_artist_handler = QueryHandler(
     search_by_artist, 'Рекомендация по артисту')
 
 show_all_handler = QueryHandler(
-    QueryPattern([And('all'), AndMulti([Or('include'), Or('artist')])]),
+    QueryPattern([And('all'), AndMulti([Or('include'), Or('artist'), Or('show')])]),
     show_all_artists, 'Вывести всех артистов в базе')
 
 info_handler = QueryHandler(

@@ -50,7 +50,7 @@ class ArtistArgument(StrArgument):
 class GenreArgument(StrArgument):
     def __init__(self, value: str):
         super().__init__(value)
-        if self.value.lower() not in GENRES:
+        if self.value.lower() not in GENRES.values():
             raise GenreArgumentError('This genre is not found ')
 
 

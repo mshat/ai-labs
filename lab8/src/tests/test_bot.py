@@ -34,6 +34,7 @@ class DataForTests:
     }
     search_show_all = {
         "покажи всех исполнителей": 'show_all_artists',
+        "покажи всех": 'show_all_artists',
         "все артисты": 'show_all_artists',
         "все рэперы": 'show_all_artists',
         "все певцы": 'show_all_artists',
@@ -321,12 +322,12 @@ class TestQueries(unittest.TestCase):
 
     def test_search_show_all(self):
         query_solver = QuerySolver(Mock())
-        query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_show_all
 
         for key in search_sentences.keys():
             with self.subTest(i=key):
+                query_solver.state = DialogState.start
                 query = SentenceParser(key).parse(query_solver.state)
                 res = query_solver.solve(query)
                 self.assertEqual(res, search_sentences[key])
