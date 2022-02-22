@@ -1,6 +1,6 @@
 from typing import List
 from lab8.src.query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as And, OrTagCondition as Or,
-                           AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti)
+                                    AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti)
 from lab8.src.dialog_state import DialogState
 from lab8.src.query_handler import log_query_pattern_strings, ALL
 from lab8.src.tools import debug_print
@@ -53,6 +53,9 @@ def search_by_genre(query: Query, user: User):
 
 def search_by_sex(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
+    artists = interface.get_all_artists()
+    artists = filter.filter_artists(artists, sex=sex.value.value)
+    interface.print_artists(artists)
     return DialogState.search
 
 
