@@ -1,5 +1,5 @@
 from typing import List, Dict
-from const import SexFilter, GroupTypeFilter
+from lab8.src.const import SexFilter, GroupTypeFilter
 
 
 class User:

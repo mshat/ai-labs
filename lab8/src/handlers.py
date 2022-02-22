@@ -9,6 +9,8 @@ from lab8.src.user import User
 from lab8.src.recommender_system import filter
 from lab8.src.recommender_system import interface
 from lab8.src.config import DEBUG
+from lab8.src.const import SexFilter
+
 
 
 def get_arguments_by_type(query: Query, argument_type: str) -> List[ArtistArgument | NumArgument]:
@@ -59,13 +61,44 @@ def search_by_sex(query: Query, user: User):
     return DialogState.search
 
 
+def search_by_age_range(query: Query, user: User):
+    age = get_arguments_by_type(query, 'NumArgument')
+    if len(age) >= 2:
+        from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
+        debug_print(f'количество артистов от {from_age} до {to_age} лет')
+
+        artists = interface.get_all_artists()
+        artists = filter.filter_artists(artists, older=from_age, younger=to_age)
+        interface.print_artists(artists)
+    else:
+        return
+    return DialogState.search
+
+
+def search_by_age(query: Query, user: User):
+    age = get_arguments_by_type(query, 'NumArgument')[0]
+    age = int(age.value)
+
+    artists = interface.get_all_artists()
+
+    if 'younger' in query.query_tag_structure:
+        debug_print(f'фильтр до {age} лет')
+        artists = filter.filter_artists(artists, younger=age)
+    elif 'older' in query.query_tag_structure:
+        debug_print(f'фильтр от {age} лет')
+        artists = filter.filter_artists(artists, older=age)
+
+    interface.print_artists(artists)
+    return DialogState.search
+
+
 def info(query: Query, user: User):
     artist_arg = get_arguments_by_type(query, 'ArtistArgument')[0]
     artist = interface.get_artist_by_name(artist_arg.value)
     if not artist:
         print('Ничего не найдено :(')
     else:
-        sex = "мужской" if artist.male_or_female==1 else "женский"
+        sex = "мужской" if artist.male_or_female == 1 else "женский"
         if artist.group_members_number == 1:
             print(f'Артист {artist.name}')
         elif artist.group_members_number == 2:
@@ -84,12 +117,19 @@ def info(query: Query, user: User):
 
 
 def number(query: Query, user: User):
-    debug_print(query.arguments.items())
+    artists = interface.get_all_artists()
+    print(f'В базе {len(artists)} исполнителя')
     return DialogState.number
 
 
 def number_with_sex(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
+    artists = interface.get_all_artists()
+    artists = filter.filter_artists(artists, sex=sex.value.value)
+    if sex.value == SexFilter.male:
+        print(f'В базе {len(artists)} исполнителя мужского пола')
+    else:
+        print(f'В базе {len(artists)} исполнитель женского пола')
     return DialogState.number
 
 
@@ -98,6 +138,11 @@ def number_with_age_range(query: Query, user: User):
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
         debug_print(f'количество артистов от {from_age} до {to_age} лет')
+
+        artists = interface.get_all_artists()
+        artists = filter.filter_artists(artists, older=from_age, younger=to_age)
+
+        print(f'Количество исполнителей от {from_age} до {to_age} лет: {len(artists)}')
     else:
         return
     return DialogState.number
@@ -272,6 +317,16 @@ number_handler = QueryHandler(
 search_by_sex_handler = QueryHandler(
     QueryPattern([Or('artist'), Or('recommend'), Or('show')], 'SexArgument'),
     search_by_sex, 'Вывести исполнителей указанного пола')
+
+search_by_age_range_handler = QueryHandler(
+    QueryPattern(
+        [AndMulti([Or('artist'), Or('recommend'), Or('show')]), AndMulti([Or('range'), OrMulti([And('older'), And('younger')])])],
+        required_arguments={'NumArgument': 2}),
+    search_by_age_range, 'Вывести исполнителей в возрасте указанного диапазона')
+
+search_by_age_handler = QueryHandler(
+    QueryPattern([AndMulti([Or('artist'), Or('recommend'), Or('show')]), AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
+    search_by_age, 'Вывести исполнителей в указанном возрасте')
 
 search_by_genre_handler = QueryHandler(
     QueryPattern([Or('genre'), Or('recommend'), Or('show')], 'GenreArgument'),

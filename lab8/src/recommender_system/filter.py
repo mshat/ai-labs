@@ -40,9 +40,9 @@ def filter_recommendations(
             continue
         if sex != 'anysex' and artist.sex != sex and 'sex' not in exclude:
             continue
-        if older and artist.age <= older and 'older' not in exclude:
+        if not (older is None) and artist.age < older and 'older' not in exclude:
             continue
-        if younger and artist.age >= younger and 'younger' not in exclude:
+        if not (younger is None) and artist.age > younger and 'younger' not in exclude:
             continue
         if artist_name not in filtered_recommendations:
             filtered_recommendations.update({artist_name: proximity})
@@ -63,9 +63,9 @@ def filter_artists(
             continue
         if sex != 'anysex' and artist.sex != sex and 'sex' not in exclude:
             continue
-        if older and artist.age <= older and 'older' not in exclude:
+        if not (older is None) and artist.age < older and 'older' not in exclude:
             continue
-        if younger and artist.age >= younger and 'younger' not in exclude:
+        if not (younger is None) and artist.age > younger and 'younger' not in exclude:
             continue
         if artist not in filtered:
             filtered.append(artist)

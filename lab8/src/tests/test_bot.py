@@ -32,6 +32,14 @@ class DataForTests:
         "исполнители женского пола": 'search_by_sex',
         "все рэперы женщины": 'search_by_sex',
     }
+    search_by_age = {
+        "порекомендуй исполнителей старше 26 лет": 'search_by_age',
+        "покажи исполнителей старше 25 лет": 'search_by_age',
+        "выведи исполнителей младше 25 лет": 'search_by_age',
+        "покажи артистов младше 0 лет": 'search_by_age',
+        "порекомендуй артистов от 32 до 43 лет": 'search_by_age_range',
+        "порекомендуй исполнителей от 49 до 49 лет": 'search_by_age_range',
+    }
     search_show_all = {
         "покажи всех исполнителей": 'show_all_artists',
         "покажи всех": 'show_all_artists',
@@ -308,6 +316,23 @@ class TestQueries(unittest.TestCase):
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_by_sex
+
+        restart_query = 'в начало'
+
+        for key in search_sentences.keys():
+            with self.subTest(i=key):
+                query_solver.solve(SentenceParser(restart_query).parse(query_solver.state))
+
+                query = SentenceParser(key).parse(query_solver.state)
+                res = query_solver.solve(query)
+
+                self.assertEqual(res, search_sentences[key])
+
+    def test_search_by_age(self):
+        query_solver = QuerySolver(Mock())
+        query_solver.state = DialogState.start
+
+        search_sentences = DataForTests.search_by_age
 
         restart_query = 'в начало'
 

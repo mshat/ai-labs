@@ -59,6 +59,8 @@ class QuerySolver:
         search_handlers = [
             handlers.search_by_artist_handler,
             handlers.search_by_sex_handler,
+            handlers.search_by_age_range_handler,
+            handlers.search_by_age_handler,
             handlers.search_by_genre_handler,
             handlers.show_all_handler,
         ]
