@@ -1,8 +1,8 @@
-from lab5.src.recommender_system.pow_distance import calc_distance_in_pow
-from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
-from lab5.src.recommender_system.tree.node import Node
-from lab5.src.recommender_system.tree.tree_tools import calc_distance_between_nodes, get_leafs, calc_max_distance_between_nodes_optimized
-from lab5.src.recommender_system.tree.tree_tools import calc_distance_between_all_nodes
+from lab8.src.recommender_system.pow_distance import calc_distance_in_pow
+from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
+from lab8.src.recommender_system.tree.node import Node
+from lab8.src.recommender_system.tree.tree_tools import calc_distance_between_nodes, get_leafs_values, calc_max_distance_between_nodes_optimized
+from lab8.src.recommender_system.tree.tree_tools import calc_distance_between_all_nodes
 
 
 def calc_euclidean_measure(leaf_1: GenreVisualNode, leaf_2: GenreVisualNode):
@@ -91,7 +91,7 @@ def normalize_proximities(leafs_pairs_proximity: dict, min_proximity: float, max
 
 def calc_generalizing_proximity_measure_for_all_leafs(tree) -> dict:
     leafs = []
-    get_leafs(tree, leafs)
+    get_leafs_values(tree, leafs)
 
     distances_between_nodes = calc_distance_between_all_nodes(tree, leafs)
     max_distance_between_nodes = calc_max_distance_between_nodes_optimized(distances_between_nodes)

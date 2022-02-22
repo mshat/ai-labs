@@ -1,11 +1,12 @@
 import os
+from typing import List
 from collections import OrderedDict
-from lab5.src.recommender_system.recommendation_list import get_recommendations
-from lab5.src.recommender_system.recommendation_list import (
+from lab8.src.recommender_system.recommendation_list import get_recommendations
+from lab8.src.recommender_system.recommendation_list import (
     Node, create_tree_from_json, load_artist_pairs_proximity_json, calc_max_general_proximity,
     calc_min_general_proximity, normalize_proximities)
-from lab5.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes
-from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
+from lab8.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes, get_leafs_values
+from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 TREE = create_tree_from_json(f'{dir_path}/data/genres.json')
@@ -18,6 +19,28 @@ normalize_proximities(ARTIST_PAIRS_PROXIMITY, min_proximity, max_proximity)
 
 class ParseError(Exception): pass
 class ArgumentError(Exception): pass
+
+
+def print_recommendations(recommendations, max_output_len=None, debug=False):
+    if max_output_len is None:
+        max_output_len = 100000
+    for i, artist_name in enumerate(recommendations):
+        if i < max_output_len:
+            if debug:
+                print(artist_name, recommendations[artist_name])
+            else:
+                print(artist_name)
+
+
+def print_artists(artists: List[GenreVisualNode], max_output_len=None, debug=False):
+    if max_output_len is None:
+        max_output_len = 100000
+    for i, artist in enumerate(artists):
+        if i < max_output_len:
+            if debug:
+                print(artist.name, artist.genre)
+            else:
+                print(artist.name)
 
 
 def find_artist(name: str) -> GenreVisualNode:
@@ -78,5 +101,12 @@ def recommend_by_liked_with_disliked(disliked_artists: str, liked_artist_names: 
             if debug:
                 print(f'Артист {dislike} удалён из выборки')
     return recommendations_by_liked
+
+
+def get_artists_by_genre(genre: str):
+    artists = []
+    genre = Node.get_child_by_name(TREE, genre)
+    get_leafs_values(genre, artists)
+    return artists
 
 

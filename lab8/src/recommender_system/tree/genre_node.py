@@ -1,7 +1,7 @@
 from .visual_node import VisualNode
 import sys
 sys.path.append("../..")
-from lab5.src.recommender_system.data.artists import ARTISTS, THEMES
+from lab8.src.recommender_system.data.artists import ARTISTS, THEMES
 
 
 class GenreVisualNode(VisualNode):

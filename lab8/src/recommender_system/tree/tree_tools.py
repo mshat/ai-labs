@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../..")
-from lab5.src.recommender_system.tree.node import Node
-from lab5.src.recommender_system.tree.genre_node import GenreVisualNode
+from lab8.src.recommender_system.tree.node import Node
+from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
 
 
 def find_path_to_node(root: Node, path: list, node_name: str):
@@ -53,7 +53,7 @@ def calc_distance_between_all_nodes(tree: Node, leafs: list):
 
 def calc_max_distance_between_nodes(tree: Node):
     leafs = []
-    get_leafs(tree, leafs)
+    get_leafs_values(tree, leafs)
     distances_between_nodes = calc_distance_between_all_nodes(tree, leafs)
     max_distance = 0
     for pair_name, pair_data in distances_between_nodes.items():
@@ -70,10 +70,10 @@ def calc_max_distance_between_nodes_optimized(distances_between_nodes: dict):
     return max_distance
 
 
-def get_leafs(root: Node, leafs: list):
+def get_leafs_values(root: Node, leafs: list):
     if not root.children:
         return root
     for child in root.children:
-        res = get_leafs(child, leafs)
+        res = get_leafs_values(child, leafs)
         if res and isinstance(res, GenreVisualNode):
             leafs.append(res)
