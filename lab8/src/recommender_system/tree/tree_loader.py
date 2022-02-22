@@ -51,6 +51,6 @@ def create_node(node_name, children_dict):
 
 def create_tree_from_json(filename='genres.json') -> VisualNode:
     tree_dict = load_tree_dict(filename)
-    return create_node('HipHop', tree_dict['HipHop'])
+    return create_node('hiphop', tree_dict['hiphop'])
 
 
