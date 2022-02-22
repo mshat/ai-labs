@@ -6,7 +6,6 @@ class Node:
     def add_child(self, node):
         self.children.append(node)
 
-
     @property
     def values_str(self):
         return str(self.value)
