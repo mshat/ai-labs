@@ -1,73 +1,75 @@
-from query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as And, OrTagCondition as Or,
+from typing import List
+from lab8.src.query_handler import (Query, QueryPattern, QueryHandler, AndTagCondition as And, OrTagCondition as Or,
                            AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti)
-from dialog_state import DialogState
-from query_handler import log_query_pattern_strings
-from tools import debug_print
+from lab8.src.dialog_state import DialogState
+from lab8.src.query_handler import log_query_pattern_strings, ALL
+from lab8.src.tools import debug_print
+from lab8.src.query import ArtistArgument, NumArgument
+from lab8.src.user import User
+from lab8.src.recommender_system import filter
+from lab8.src.recommender_system import interface
+from lab8.src.config import DEBUG
 
 
-def get_arguments_by_type(query: Query, argument_type: str):
+def get_arguments_by_type(query: Query, argument_type: str) -> List[ArtistArgument | NumArgument]:
     return [argument for type_, arguments in query.arguments.items() for argument in arguments if type_ == argument_type]
 
 
-def restart(query: Query):
+def restart(query: Query, user: User):
     return DialogState.start
 
 
-def like(query: Query):
-    allowed_states = (DialogState.search, DialogState.start)
-    artists = get_arguments_by_type(query, 'ArtistArgument')
+def like(query: Query, user: User):
+    liked_artists = get_arguments_by_type(query, 'ArtistArgument')
+    [user.add_like(artist.value) for artist in liked_artists]
     return DialogState.like
 
 
-def dislike(query: Query):
-    allowed_states = (DialogState.search, DialogState.start)
-    artists = get_arguments_by_type(query, 'ArtistArgument')
+def dislike(query: Query, user: User):
+    disliked_artists = get_arguments_by_type(query, 'ArtistArgument')
+    [user.add_dislike(artist.value) for artist in disliked_artists]
     return DialogState.dislike
 
 
-def show_all_artists(query: Query):
-    allowed_states = (DialogState.filter, DialogState.count_filter, DialogState.start)
+def show_all_artists(query: Query, user: User):
     return DialogState.search
 
 
-def search_by_artist(query: Query):
-    allowed_states = (DialogState.filter, DialogState.count_filter, DialogState.start)
-    artists = get_arguments_by_type(query, 'ArtistArgument')
+def search_by_artist(query: Query, user: User):
+    artist = get_arguments_by_type(query, 'ArtistArgument')[0]
+    res = interface.recommend_by_seed(artist.value)
+    interface.print_recommendations(res, debug=DEBUG)
     return DialogState.search
 
 
-def search_by_genre(query: Query):
-    allowed_states = (DialogState.filter, DialogState.count_filter, DialogState.start)
-    genres = get_arguments_by_type(query, 'GenreArgument')
+def search_by_genre(query: Query, user: User):
+    genre = get_arguments_by_type(query, 'GenreArgument')[0]
+    artists = interface.get_artists_by_genre(genre.value)
+    interface.print_artists(artists, debug=DEBUG)
     return DialogState.search
 
 
-def search_by_sex(query: Query):
-    allowed_states = (DialogState.filter, DialogState.count_filter, DialogState.start)
+def search_by_sex(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     return DialogState.search
 
 
-def info(query: Query):
-    allowed_states = (DialogState.filter, DialogState.count_filter, DialogState.start)
+def info(query: Query, user: User):
     artists = get_arguments_by_type(query, 'ArtistArgument')
     return DialogState.info
 
 
-def number(query: Query):
-    allowed_states = (DialogState.number, DialogState.search, DialogState.start)
+def number(query: Query, user: User):
     debug_print(query.arguments.items())
     return DialogState.number
 
 
-def number_with_sex(query: Query):
-    allowed_states = (DialogState.number, DialogState.search, DialogState.start)
+def number_with_sex(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     return DialogState.number
 
 
-def number_with_age_range(query: Query):
-    allowed_states = (DialogState.number, DialogState.search, DialogState.start)
+def number_with_age_range(query: Query, user: User):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
@@ -77,8 +79,7 @@ def number_with_age_range(query: Query):
     return DialogState.number
 
 
-def number_with_age(query: Query):
-    allowed_states = (DialogState.number, DialogState.search, DialogState.start)
+def number_with_age(query: Query, user: User):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         age = age[0]
@@ -90,29 +91,25 @@ def number_with_age(query: Query):
     return DialogState.number
 
 
-def set_result_len(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def set_result_len(query: Query, user: User):
     result_len = get_arguments_by_type(query, 'NumArgument')[-1]
     debug_print(f'Выводить по {result_len} строк')
     return DialogState.count_filter
 
 
-def filter_by_sex_include(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_sex_include(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     # debug_debug_print(f'Убрать всех, кроме {sex} пола')
     return DialogState.filter
 
 
-def filter_by_sex_exclude(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_sex_exclude(query: Query, user: User):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     debug_print(f'Убрать артистов {sex} пола')
     return DialogState.filter
 
 
-def filter_by_age_range(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_age_range(query: Query, user: User):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
@@ -122,8 +119,7 @@ def filter_by_age_range(query: Query):
     return DialogState.filter
 
 
-def filter_by_age_include(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_age_include(query: Query, user: User):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) > 1:
         age = age[0]
@@ -134,8 +130,7 @@ def filter_by_age_include(query: Query):
     return DialogState.filter
 
 
-def filter_by_age_exclude(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_age_exclude(query: Query, user: User):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) > 1:
         age = age[0]
@@ -146,8 +141,7 @@ def filter_by_age_exclude(query: Query):
     return DialogState.filter
 
 
-def filter_by_members_count(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def filter_by_members_count(query: Query, user: User):
     tags = query.query_tag_structure
     if 'group' in tags:
         members_count_type = 'group'
@@ -159,13 +153,11 @@ def filter_by_members_count(query: Query):
     return DialogState.filter
 
 
-def remove_result_len_filter(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def remove_result_len_filter(query: Query, user: User):
     return DialogState.filter
 
 
-def remove_filters(query: Query):
-    allowed_states = (DialogState.filter, DialogState.start)
+def remove_filters(query: Query, user: User):
     return DialogState.filter
 
 
@@ -215,19 +207,19 @@ remove_result_len_filter_handler = QueryHandler(
     remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
 
 exclude_dislike_handler = QueryHandler(
-    QueryPattern([And('dislike'), And('exclude')]),
+    QueryPattern([And('dislike'), And('exclude')], required_arguments={'ArtistArgument': ALL}),
     like, 'Лайк')
 
 exclude_like_handler = QueryHandler(
-    QueryPattern([And('like'), And('exclude')]),
+    QueryPattern([And('like'), And('exclude')], required_arguments={'ArtistArgument': ALL}),
     dislike, 'Дизлайк')
 
 like_handler = QueryHandler(
-    QueryPattern([And('like')]),
+    QueryPattern([And('like')], required_arguments={'ArtistArgument': ALL}),
     like, 'Лайк')
 
 dislike_handler = QueryHandler(
-    QueryPattern([And('dislike')]),
+    QueryPattern([And('dislike')], required_arguments={'ArtistArgument': ALL}),
     dislike, 'Дизлайк')
 
 number_with_sex_handler = QueryHandler(
