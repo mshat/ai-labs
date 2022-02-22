@@ -1,6 +1,6 @@
 from typing import List
-from word import Word, Placeholder
-from data import ARTISTS, GENRES, GENDERS
+from lab8.src.word import Word, Placeholder
+from lab8.src.data import ARTISTS, GENRES, GENDERS
 
 
 class ArgumentError(Exception): pass

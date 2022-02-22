@@ -1,14 +1,16 @@
 from typing import Tuple, List
-import handlers
-from query import Query
-from dialog_state import DialogState
-from config import DEBUG
-from query_handler import QueryHandler
+from lab8.src import handlers
+from lab8.src.query import Query
+from lab8.src.dialog_state import DialogState
+from lab8.src.config import DEBUG
+from lab8.src.query_handler import QueryHandler
+from lab8.src.user import User
 
 
 class QuerySolver:
-    def __init__(self):
+    def __init__(self, user: User):
         self._state = DialogState.start
+        self._user = user
         self.response = None
 
     @property
@@ -27,7 +29,7 @@ class QuerySolver:
     def match_patterns(self, handlers_: List[QueryHandler], query: Query) -> str | None:
         for handler in handlers_:
             if handler.match_pattern(query):
-                self.state = handler.handle(query)
+                self.state = handler.handle(query, self._user)
                 handler.remove_used_keywords_and_args(query)
                 return handler.handle.__name__
 
@@ -101,14 +103,20 @@ class QuerySolver:
         res = self.match_restart_patterns(query)
         if res: return res
 
-        if self.state in (DialogState.search, DialogState.filter, DialogState.count_filter):
+        if self.state.value in (DialogState.search.value, DialogState.filter.value, DialogState.count_filter.value):
             res = self.match_filter_patterns(query)
             if res:
                 return res
             else:
                 self.state = DialogState.start
 
-        if self.state in (DialogState.start, DialogState.number, DialogState.like, DialogState.dislike, DialogState.info):
+        if self.state.value in (
+                DialogState.start.value,
+                DialogState.number.value,
+                DialogState.like.value,
+                DialogState.dislike.value,
+                DialogState.info.value
+        ):
             res = self.match_like_dislike_patterns(query)
             if res: return res
 
