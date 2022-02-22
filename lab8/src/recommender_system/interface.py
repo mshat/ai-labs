@@ -103,6 +103,11 @@ def recommend_by_liked_with_disliked(disliked_artists: str, liked_artist_names: 
     return recommendations_by_liked
 
 
+def get_artist_by_name(name: str):
+    artist = Node.get_child_by_name(TREE, name)
+    return artist
+
+
 def get_all_artists():
     artists = []
     get_leafs_values(TREE, artists)

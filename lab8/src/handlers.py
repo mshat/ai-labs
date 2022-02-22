@@ -60,7 +60,26 @@ def search_by_sex(query: Query, user: User):
 
 
 def info(query: Query, user: User):
-    artists = get_arguments_by_type(query, 'ArtistArgument')
+    artist_arg = get_arguments_by_type(query, 'ArtistArgument')[0]
+    artist = interface.get_artist_by_name(artist_arg.value)
+    if not artist:
+        print('Ничего не найдено :(')
+    else:
+        sex = "мужской" if artist.male_or_female==1 else "женский"
+        if artist.group_members_number == 1:
+            print(f'Артист {artist.name}')
+        elif artist.group_members_number == 2:
+            print(f'Дуэт {artist.name}')
+        else:
+            print(f'Группа {artist.name}')
+        if artist.group_members_number > 1:
+            print(f'Возраст фронтмэна: {artist.age}')
+            print(f'Пол фронтмэна: {sex}')
+            print(f'Количество участников: {artist.group_members_number}')
+        else:
+            print(f'Возраст: {artist.age}')
+            print(f'Пол: {sex}')
+
     return DialogState.info
 
 
@@ -103,6 +122,7 @@ def set_result_len(query: Query, user: User):
 
 
 def filter_by_sex_include(query: Query, user: User):
+    # user.add_sex_filter(sex.value)
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     # debug_debug_print(f'Убрать всех, кроме {sex} пола')
     return DialogState.filter
