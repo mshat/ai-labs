@@ -1,9 +1,11 @@
 from typing import List, Callable, Tuple, Dict
-from query import Query, Word, Argument
-from tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
-from config import SHOW_QUERY_PATTERNS, DEBUG
+from lab8.src.query import Query, Word, Argument
+from lab8.src.tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
+from lab8.src.config import SHOW_QUERY_PATTERNS, DEBUG
 
 QUERY_PATTERN_STRINGS = []
+
+ALL = -1
 
 
 def log_query_pattern_strings():
@@ -42,9 +44,17 @@ class QueryPattern:
         if self.required_arguments:
             for arg_type, num in self.required_arguments.items():
                 if arg_type in query.arguments:
-                    if len(query.arguments[arg_type]) >= num:
+                    required_arguments_num = len(query.arguments[arg_type])
+                    if num == ALL and required_arguments_num > 0:
+                        res = True
+                        used_args = query.arguments[arg_type]
+                    elif required_arguments_num >= num:
                         res = True
                         used_args = query.arguments[arg_type][:num]
+                    else:
+                        res = False
+                else:
+                    res = False
 
         match_res, used_words = self.pattern_matcher.match_pattern(query_tag_structure)
         if match_res:
@@ -59,8 +69,15 @@ class QueryPattern:
         conditions = ' '.join([str(cond) for cond in self.conditions])
         conditions_without_first_word = conditions.split()[1:]
         conditions = ' '.join(conditions_without_first_word)
+        if self.required_argument_type:
+            arguments = f'{self.required_argument_type}: 1'
+        elif self.required_arguments:
+            arguments = ' '.join([f'{argument}: {num if num != ALL else "ALL"}'
+                                  for argument, num in self.required_arguments.items()])
+        else:
+            arguments = ''
 
-        return f'Необходимый аргумент: {str(self.required_argument_type).ljust(14)} | Условие: {conditions}'
+        return f'Аргументы: {arguments.ljust(20)} | Условие: {conditions}'
 
 
 class QueryHandler:
