@@ -1,11 +1,11 @@
 import re
 from typing import List, Dict, ClassVar, Union
-from morph_nalyzer import MorphAnalyzer
-from word import BaseWord, Placeholder, Word
-from query import (ArtistArgumentError, GenreArgumentError, ArgumentError, Argument, ArtistArgument, SexArgument,
+from lab8.src.morph_nalyzer import MorphAnalyzer
+from lab8.src.word import BaseWord, Placeholder, Word
+from lab8.src.query import (ArtistArgumentError, GenreArgumentError, ArgumentError, Argument, ArtistArgument, SexArgument,
                    GenreArgument, StrArgument, NumArgument, ARTISTS, GENRES, Query)
-from word_classifier import WORD_CLASSIFIER
-from data import GENDERS
+from lab8.src.word_classifier import WORD_CLASSIFIER
+from lab8.src.data import GENDERS
 
 PLACEHOLDERS = {'artist': '*ARTISTNAME*', 'genre': '*GENRENAME*', 'gender': '*GENDER*', 'number': '*NUMBER*'}
 
@@ -64,13 +64,12 @@ class SentenceParser:
         return words
 
     def parse(self, dialog_state) -> Query:
-        artist_arguments = [ArtistArgument(arg) for arg in self.find_arguments(ARTISTS, PLACEHOLDERS['artist'])]
-        genre_arguments = [GenreArgument(arg) for arg in self.find_arguments(GENRES, PLACEHOLDERS['genre'])]
-        gender_arguments = [SexArgument(arg) for arg in self.find_arguments(GENDERS, PLACEHOLDERS['gender'])]
-        number_arguments = [NumArgument(arg) for arg in self.find_number_arguments(PLACEHOLDERS['number'])]
-        arguments = [*artist_arguments, *genre_arguments, *gender_arguments, *number_arguments]
+        artist_args = [ArtistArgument(arg) for arg in self.find_arguments(ARTISTS, PLACEHOLDERS['artist'])]
+        genre_args = [GenreArgument(arg) for arg in self.find_arguments(GENRES, PLACEHOLDERS['genre'])]
+        gender_args = [SexArgument(arg) for arg in self.find_arguments(GENDERS, PLACEHOLDERS['gender'])]
+        number_args = [NumArgument(arg) for arg in self.find_number_arguments(PLACEHOLDERS['number'])]
+        arguments = [*artist_args, *genre_args, *gender_args, *number_args]
 
-        # raw_words = self._sentence.split()
         raw_words = self._split()
 
         parsed_words: List[Union[BaseWord, Word]] = []
