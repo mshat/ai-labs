@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 from lab8.src.query_solver import QuerySolver, DialogState
 from lab8.src.parsers import SentenceParser
 
@@ -101,7 +102,7 @@ class DataForTests:
 
 class TestIntegrationStates(unittest.TestCase):
     def check_next_states(self, state, allowed_sentences: dict, disallowed_sentences: dict):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
 
         sentences = {
             'allowed': allowed_sentences,
@@ -220,7 +221,7 @@ class TestIntegrationStates(unittest.TestCase):
 
     def test_repeat_states(self):
         """ Проверяет, что можно делать подряд несколько запросов для одного состояния"""
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
 
         sentences = {
             'search_by_artist': "найди похожих исполнителей на крека",
@@ -251,7 +252,7 @@ class TestIntegrationStates(unittest.TestCase):
         QuerySolver принимает по порядку следующие состояния:
         поиск, фильтрация, лайк, дизлайк, количественный запрос, информационный запрос
         """
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
 
         sentences = {
             'search_by_artist': "найди похожих исполнителей на крека",
@@ -276,7 +277,7 @@ class TestIntegrationStates(unittest.TestCase):
 
 class TestQueries(unittest.TestCase):
     def test_search_by_name(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_by_name
@@ -289,7 +290,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_search_by_genre(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_by_genre
@@ -302,7 +303,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_search_by_sex(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_by_sex
@@ -319,7 +320,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_search_show_all(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.search_show_all
@@ -331,7 +332,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_filter(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.search
 
         search_sentences = DataForTests.test_filter
@@ -344,7 +345,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_like_dislike(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.like_dislike
@@ -357,7 +358,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_number_queries(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.number_queries
@@ -370,7 +371,7 @@ class TestQueries(unittest.TestCase):
                 self.assertEqual(res, search_sentences[key])
 
     def test_info(self):
-        query_solver = QuerySolver()
+        query_solver = QuerySolver(Mock())
         query_solver.state = DialogState.start
 
         search_sentences = DataForTests.test_info
