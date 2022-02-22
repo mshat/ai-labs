@@ -29,14 +29,12 @@ class NumArgument(Argument):
 class StrArgument(Argument):
     def __init__(self, value: str):
         super().__init__(value)
-        if not isinstance(value, str):
-            raise ArgumentError('Wrong value type')
 
 
 class SexArgument(StrArgument):
     def __init__(self, value: str):
         super().__init__(value)
-        if self.value.lower() not in GENDERS.values():
+        if self.value not in GENDERS.values():
             raise ArtistArgumentError('This sex is not found ')
 
 
