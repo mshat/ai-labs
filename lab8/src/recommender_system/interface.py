@@ -21,11 +21,11 @@ class ParseError(Exception): pass
 class ArgumentError(Exception): pass
 
 
-def print_recommendations(recommendations, max_output_len=None, debug=False):
-    if max_output_len is None:
-        max_output_len = 100000
+def print_recommendations(recommendations, output_len=None, debug=False):
+    if output_len is None:
+        output_len = 100000
     for i, artist_name in enumerate(recommendations):
-        if i < max_output_len:
+        if i < output_len:
             if debug:
                 print(artist_name, recommendations[artist_name])
             else:
@@ -58,9 +58,17 @@ def split_artists(artists: str):
     return res
 
 
-def recommend_by_seed(seed_artist: str):
+def recommend_by_seed(seed_artist: str, disliked_artists: [str], debug=False):
     seed = find_artist(seed_artist)
-    return get_recommendations(seed, ARTIST_PAIRS_PROXIMITY)
+
+    recommendations = get_recommendations(seed, ARTIST_PAIRS_PROXIMITY)
+    for dislike in disliked_artists:
+        if dislike in recommendations:
+            recommendations.pop(dislike)
+            if debug:
+                print(f'Артист {dislike} удалён из выборки')
+
+    return recommendations
 
 
 def recommend_by_liked(liked_artist_names: str):

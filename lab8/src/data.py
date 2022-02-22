@@ -1,5 +1,6 @@
 # ARTISTS = ['лигалайз', 'многоточие', 'krec', 'guf', 'баста', 'каста', 'ак-47', 'каспийский груз', 'кровосток', 'the chemodan', 'смоки мо', 'рем дигга', 'миша маваши', 'd-man 55', 'грот', 'oxxxymiron', 'соня мармеладова', 'alyona alyona', 'sid', 'redo', 'ram', 'полумягкие', 'оу74', 'паша техник', 'овсянкин', 'pharaoh', 'boulevard depo', 'mnogoznaal', 'kizaru', 'лсп', 'atl', 'макс корж', 'slava marlow', 'скриптонит', 'noize mc', 'loqiemean', 'anacondaz', '25/17', 'lizer', 'джизус', 'мукка', 'lizer', 'face', 'gone.fludd', 'big baby tape', 'элджей', 'morgenshtern', 'rakhim', 'егор крид', 'тимати', 'pyrokinesis', 't-fest', 'miyagi', 'jah khalib', 'hammali & navai']
 # GENRES = ['freestyle', 'regular', 'emo', 'raprock', 'cloud', 'club', 'drill', 'electronicvocal', 'grime', 'mumble', 'phonk', 'hardcore', 'horrorcore', 'underground', 'hookah', 'pop', 'gangsta', 'workout', 'classic', 'soft']
+from lab8.src.const import SexFilter
 
 keywords = {
     'search': ('найти', 'похожий', 'схожий', 'как',),
@@ -9,11 +10,11 @@ keywords = {
     'genre': ('жанр', 'стиль',),
 
     'about': ('о', 'про'),
-
+    'except': ('кроме', 'исключая'),
     'recommend': ('посоветовать', 'порекомендовать',),
     'show': ('показывать', 'показать', 'выводить', 'вывести'),
     'include': ('оставить', 'оставлять', 'добавить', 'включить', 'прибавить', 'выбрать'),
-    'exclude': ('убрать', 'исключать', 'исключить', 'отмести', 'отметать', 'выкинуть', 'выкидывать', 'отсеить', 'отсеивать', 'удалять', 'удалить', 'удаль', 'удали'),
+    'exclude': ('убрать', 'исключать', 'исключить', 'отмести', 'отметать', 'выкинуть', 'выкидывать', 'отсеить', 'отсеивать', 'удалять', 'удалить', 'удаль', 'отфильтровать',),
     'all': ('весь', 'всё'),
     'year': ('год',),
     'older': ('старший', 'большой', 'за', 'от'),
@@ -46,14 +47,14 @@ keywords = {
 #                 print(tag1, tag2, set(aliases1) & set(aliases2))
 
 GENDERS = {
-    'мужcкой': 'мужской',
-    'мужского': 'мужской',
-    'мужчин': 'мужской',
-    'мужчина': 'мужской',
-    'женский': 'женский',
-    'женского': 'женский',
-    'женщин': 'женский',
-    'женщина': 'женский',
+    'мужcкой': SexFilter.male,
+    'мужского': SexFilter.male,
+    'мужчин': SexFilter.male,
+    'мужчина': SexFilter.male,
+    'женский': SexFilter.female,
+    'женского': SexFilter.female,
+    'женщин': SexFilter.female,
+    'женщина': SexFilter.female,
 }
 
 ARTISTS = {

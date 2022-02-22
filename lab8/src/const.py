@@ -2,7 +2,7 @@ import enum
 
 
 class SexFilter(enum.Enum):
-    any = 'any_sex'
+    any = 'anysex'
     female = 'female'
     male = 'male'
 

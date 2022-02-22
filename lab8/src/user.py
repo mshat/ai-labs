@@ -10,6 +10,8 @@ class User:
     _younger_filter: int | None
     _older_filter: int | None
     _sex_filter: SexFilter
+    search_result: List
+    output_len: int
 
     def __init__(self, name: str = None):
         self._name = name
@@ -19,6 +21,21 @@ class User:
         self._younger_filter = None
         self._older_filter = None
         self._sex_filter = SexFilter.any
+        self.search_result = []
+        self.output_len = 1000
+
+    @property
+    def str_filters(self):
+        res = ''
+        if self.group_type_filter != GroupTypeFilter.any:
+            res += f'по количеству исполнителей: {self.group_type_filter.value} '
+        if self.sex_filter != SexFilter.any:
+            res += f'по полу: {self.sex_filter.value} '
+        if self._older_filter:
+            res += f'старше: {self._older_filter}'
+        if self._younger_filter:
+            res += f'моложе: {self._younger_filter}'
+        return res
 
     @property
     def name(self) -> str:
@@ -38,7 +55,7 @@ class User:
 
     @property
     def younger_filter(self) -> int | None:
-        return self.younger_filter
+        return self._younger_filter
 
     @younger_filter.setter
     def younger_filter(self, val: int):
@@ -46,7 +63,7 @@ class User:
 
     @property
     def older_filter(self) -> int | None:
-        return self.older_filter
+        return self._older_filter
 
     @older_filter.setter
     def older_filter(self, val: int):

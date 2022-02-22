@@ -20,12 +20,12 @@ class PatternMatcher:  # TODO как-то вынести в отдельный �
             res, used_words = condition.solve(query_tag_structure)
             if res:
                 all_used_words += used_words
-            if isinstance(condition, AndTagCondition) or isinstance(condition, AndMultiTagCondition):
+            if isinstance(condition, And):
                 if match_res is None:
                     match_res = res
                 else:
                     match_res *= res
-            elif isinstance(condition, OrTagCondition) or isinstance(condition, OrMultiTagCondition):
+            elif isinstance(condition, Or):
                 if match_res is None:
                     match_res = res
                 else:
@@ -34,7 +34,7 @@ class PatternMatcher:  # TODO как-то вынести в отдельный �
                 raise Exception('Unknown condition!')
 
         if match_res is None:
-            match_res = False
+            match_res = True
         return match_res, all_used_words
 
 
@@ -55,7 +55,30 @@ class TagCondition(ABC):
             return False, []
 
 
-class AndTagCondition(TagCondition):
+class NotTagCondition(ABC):
+    """
+    Условие - составная часть паттерна запроса.
+    Инициализируется тэгом, которого не должно быть в запросе, чтобы паттерн подошел к запросу
+    """
+
+    def __init__(self, tag: str):
+        assert tag in keywords
+        self.tag = tag
+
+    def solve(self, query_tag_structure: Dict) -> Tuple[bool, List[Word]]:
+        if self.tag not in query_tag_structure:
+            return True, []
+        else:
+            return False, []
+
+
+class And: pass
+
+
+class Or: pass
+
+
+class AndTagCondition(And, TagCondition):
     """
     Условие "И"
     Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
@@ -67,13 +90,37 @@ class AndTagCondition(TagCondition):
         return self.__str__()
 
 
-class OrTagCondition(TagCondition):
+class OrTagCondition(Or, TagCondition):
     """
     Условие "ИЛИ"
     Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом
     """
     def __str__(self):
         return f'OR {self.tag}'
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class AndNotTagCondition(And, NotTagCondition):
+    """
+    Условие "И"
+    Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
+    """
+    def __str__(self):
+        return f'AND NOT {self.tag}'
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class OrNotTagCondition(Or, NotTagCondition):
+    """
+    Условие "ИЛИ"
+    Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом
+    """
+    def __str__(self):
+        return f'OR NOT {self.tag}'
 
     def __repr__(self):
         return self.__str__()
@@ -101,7 +148,7 @@ class MultiTagCondition(ABC):
         return conditions
 
 
-class AndMultiTagCondition(MultiTagCondition):
+class AndMultiTagCondition(And, MultiTagCondition):
     """
     Мультиусловиеусловие "И"
     Такое условие должно обязательно выполняться для запроса, чтобы паттерн подошел к нему
@@ -114,7 +161,7 @@ class AndMultiTagCondition(MultiTagCondition):
         return self.__str__()
 
 
-class OrMultiTagCondition(MultiTagCondition):
+class OrMultiTagCondition(Or, MultiTagCondition):
     """
     Мультиусловие "ИЛИ"
     Результат проверки такого условия будет учитываться как логическое СЛОЖЕНИЕ при сопоставлении паттерна с запросом

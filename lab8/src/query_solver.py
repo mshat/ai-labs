@@ -56,6 +56,15 @@ class QuerySolver:
         return self.match_patterns(number_query_handlers, query)
 
     def match_search_patterns(self, query: Query):
+        search_handler = handlers.search_by_artist_handler
+        if search_handler.match_pattern(query):
+            self.state = search_handler.handle(query, self._user)
+            search_handler.remove_used_keywords_and_args(query)
+            used_filter = self.solve_multi_filters(query)
+            if used_filter is None:
+                handlers.show_recommendations(self._user)
+            return search_handler.handle.__name__
+
         search_handlers = [
             handlers.search_by_artist_handler,
             handlers.search_by_sex_handler,
@@ -64,11 +73,7 @@ class QuerySolver:
             handlers.search_by_genre_handler,
             handlers.show_all_handler,
         ]
-        res = self.match_patterns(search_handlers, query)
-        if res:
-            if query.query_tag_structure:
-                self.solve_multi_filters(query)
-        return res
+        return self.match_patterns(search_handlers, query)
 
     def match_info_patterns(self, query: Query):
         info_handlers = [
@@ -84,7 +89,7 @@ class QuerySolver:
             handlers.filter_by_age_exclude_handler,
             handlers.filter_by_age_include_handler,
             handlers.filter_by_members_count_handler,
-            handlers.set_result_len_handler,
+            handlers.set_output_len_handler,
             handlers.remove_filters_handler,
             handlers.remove_result_len_filter_handler,
         ]
