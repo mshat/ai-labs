@@ -11,19 +11,18 @@ from lab8.src.user import User
 from lab8.src.recommender_system import filter
 from lab8.src.recommender_system import interface
 from lab8.src.config import DEBUG
-from lab8.src.const import SexFilter
+from lab8.src.const import SexFilter, GroupTypeFilter
 
 
 def filter_search_result(user: User):
     if user.search_result:
-        user.search_result = filter.filter_recommendations(
+        return filter.filter_recommendations(
             user.search_result,
             group_type=user.group_type_filter.value,
             sex=user.sex_filter.value,
             younger=user.younger_filter,
             older=user.older_filter,
         )
-    return user.search_result
 
 
 def show_recommendations(user: User):
@@ -31,7 +30,11 @@ def show_recommendations(user: User):
         print(f'Установлены фильтры: {user.str_filters}')
     if user.dislikes:
         print(f'Список дизлайков: {", ".join(user.dislikes)}')
-    artists = filter_search_result(user)
+    filtered = filter_search_result(user)
+    if filtered:
+        artists = filtered
+    else:
+        artists = user.search_result
     interface.print_recommendations(artists, output_len=user.output_len, debug=DEBUG)
 
 
@@ -40,11 +43,11 @@ def get_arguments_by_type(query: Query, argument_type: str) \
     return [argument for type_, arguments in query.arguments.items() for argument in arguments if type_ == argument_type]
 
 
-def restart(query: Query, user: User):
+def restart(query: Query, user: User, show=True):
     return DialogState.start
 
 
-def like(query: Query, user: User):
+def like(query: Query, user: User, show=True):
     liked_artists = get_arguments_by_type(query, 'ArtistArgument')
     liked_artists = [artist.value for artist in liked_artists]
     for artist in liked_artists:
@@ -53,7 +56,7 @@ def like(query: Query, user: User):
     return DialogState.like
 
 
-def dislike(query: Query, user: User):
+def dislike(query: Query, user: User, show=True):
     disliked_artists = get_arguments_by_type(query, 'ArtistArgument')
     disliked_artists = [artist.value for artist in disliked_artists]
     for artist in disliked_artists:
@@ -62,27 +65,27 @@ def dislike(query: Query, user: User):
     return DialogState.dislike
 
 
-def show_all_artists(query: Query, user: User):
+def show_all_artists(query: Query, user: User, show=True):
     artists = interface.get_all_artists()
     interface.print_artists(artists)
     return DialogState.search
 
 
-def search_by_artist(query: Query, user: User):
+def search_by_artist(query: Query, user: User, show=True):
     artist = get_arguments_by_type(query, 'ArtistArgument')[0]
     artists = interface.recommend_by_seed(artist.value, disliked_artists=user.dislikes)
     user.search_result = artists
     return DialogState.search
 
 
-def search_by_genre(query: Query, user: User):
+def search_by_genre(query: Query, user: User, show=True):
     genre = get_arguments_by_type(query, 'GenreArgument')[0]
     artists = interface.get_artists_by_genre(genre.value)
     interface.print_artists(artists, debug=DEBUG)
     return DialogState.search
 
 
-def search_by_sex(query: Query, user: User):
+def search_by_sex(query: Query, user: User, show=True):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     artists = interface.get_all_artists()
     artists = filter.filter_artists(artists, sex=sex.value.value)
@@ -90,7 +93,7 @@ def search_by_sex(query: Query, user: User):
     return DialogState.search
 
 
-def search_by_age_range(query: Query, user: User):
+def search_by_age_range(query: Query, user: User, show=True):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
@@ -105,7 +108,7 @@ def search_by_age_range(query: Query, user: User):
     return DialogState.search
 
 
-def search_by_age(query: Query, user: User):
+def search_by_age(query: Query, user: User, show=True):
     age = get_arguments_by_type(query, 'NumArgument')[0]
     age = int(age.value)
 
@@ -123,7 +126,7 @@ def search_by_age(query: Query, user: User):
     return DialogState.search
 
 
-def info(query: Query, user: User):
+def info(query: Query, user: User, show=True):
     artist_arg = get_arguments_by_type(query, 'ArtistArgument')[0]
     artist = interface.get_artist_by_name(artist_arg.value)
     if not artist:
@@ -147,13 +150,13 @@ def info(query: Query, user: User):
     return DialogState.info
 
 
-def number(query: Query, user: User):
+def number(query: Query, user: User, show=True):
     artists = interface.get_all_artists()
     print(f'В базе {len(artists)} исполнителя')
     return DialogState.number
 
 
-def number_with_sex(query: Query, user: User):
+def number_with_sex(query: Query, user: User, show=True):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     artists = interface.get_all_artists()
     artists = filter.filter_artists(artists, sex=sex.value.value)
@@ -164,7 +167,7 @@ def number_with_sex(query: Query, user: User):
     return DialogState.number
 
 
-def number_with_age_range(query: Query, user: User):
+def number_with_age_range(query: Query, user: User, show=True):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
@@ -179,7 +182,7 @@ def number_with_age_range(query: Query, user: User):
     return DialogState.number
 
 
-def number_with_age(query: Query, user: User):
+def number_with_age(query: Query, user: User, show=True):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         age = age[0]
@@ -191,86 +194,120 @@ def number_with_age(query: Query, user: User):
     return DialogState.number
 
 
-def set_output_len(query: Query, user: User):
+def set_output_len(query: Query, user: User, show=True):
     output_len = get_arguments_by_type(query, 'NumArgument')[-1]
-    user.output_len = output_len
+
+    user.output_len = int(output_len.value)
+
+    if show:
+        show_recommendations(user)
+
     debug_print(f'Ограничение вывода: {output_len} строк')
     return DialogState.count_filter
 
 
-def filter_by_sex_include(query: Query, user: User):
+def filter_by_sex_include(query: Query, user: User, show=True):
     sex = get_arguments_by_type(query, 'SexArgument')[0]
     debug_print(f'Убрать всех, кроме {sex.value.value} пола')
 
     user.add_sex_filter(sex.value)
 
-    filter_search_result(user)
-    show_recommendations(user)
+    if show:
+        show_recommendations(user)
     return DialogState.filter
 
 
-def filter_by_sex_exclude(query: Query, user: User):
+def filter_by_sex_exclude(query: Query, user: User, show=True):
     sex_arg = get_arguments_by_type(query, 'SexArgument')[0]
     debug_print(f'Убрать артистов {sex_arg.value} пола')
 
     sex = SexFilter.male if sex_arg.value == SexFilter.female else SexFilter.female
     user.add_sex_filter(sex)
 
-    filter_search_result(user)
-    show_recommendations(user)
+    if show:
+        show_recommendations(user)
 
     return DialogState.filter
 
 
-def filter_by_age_range(query: Query, user: User):
+def filter_by_age_range(query: Query, user: User, show=True):
     age = get_arguments_by_type(query, 'NumArgument')
     if len(age) >= 2:
         from_age, to_age = sorted([int(age[0].value), int(age[1].value)])
         debug_print(f'фильтр от {from_age} до {to_age} лет')
+
+        user.older_filter = from_age
+        user.younger_filter = to_age
+
+        if show:
+            show_recommendations(user)
     else:
-        return
+        return DialogState.filter
     return DialogState.filter
 
 
-def filter_by_age_include(query: Query, user: User):
-    age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) > 1:
-        age = age[0]
+def filter_by_age_include(query: Query, user: User, show=True):
+    age = get_arguments_by_type(query, 'NumArgument')[0]
+    age = int(age.value)
     if 'younger' in query.query_tag_structure:
         debug_print(f'фильтр до {age} лет')
+        user.younger_filter = age
     elif 'older' in query.query_tag_structure:
         debug_print(f'фильтр от {age} лет')
+        user.older_filter = age
+    else:
+        return DialogState.filter
+
+    if show:
+        show_recommendations(user)
     return DialogState.filter
 
 
-def filter_by_age_exclude(query: Query, user: User):
-    age = get_arguments_by_type(query, 'NumArgument')
-    if len(age) > 1:
-        age = age[0]
+def filter_by_age_exclude(query: Query, user: User, show=True):
+    age = get_arguments_by_type(query, 'NumArgument')[0]
+    age = int(age.value)
     if 'younger' in query.query_tag_structure:
         debug_print(f'фильтр от {age} лет')
+        user.older_filter = age
     elif 'older' in query.query_tag_structure:
         debug_print(f'фильтр до {age} лет')
+        user.younger_filter = age
+    else:
+        return DialogState.filter
+
+    if show:
+        show_recommendations(user)
     return DialogState.filter
 
 
-def filter_by_members_count(query: Query, user: User):
+def filter_by_members_count(query: Query, user: User, show=True):
     tags = query.query_tag_structure
     if 'group' in tags:
-        members_count_type = 'group'
+        user.group_type_filter = GroupTypeFilter.group
     elif 'solo' in tags:
-        members_count_type = 'solo'
+        user.group_type_filter = GroupTypeFilter.solo
     elif 'duet' in tags:
-        members_count_type = 'duet'
-    debug_print(f'оставить {members_count_type}')
+        user.group_type_filter = GroupTypeFilter.duet
+    else:
+        return DialogState.filter
+
+    if show:
+        show_recommendations(user)
+    debug_print(f'оставить {user.group_type_filter}')
     return DialogState.filter
 
 
-def remove_result_len_filter(query: Query, user: User):
+def remove_result_len_filter(query: Query, user: User, show=True):
+    user.output_len = 1000
+    if show:
+        show_recommendations(user)
     return DialogState.filter
 
 
-def remove_filters(query: Query, user: User):
+def remove_filters(query: Query, user: User, show=True):
+    user.set_all_filters_to_default()
+    if show:
+        show_recommendations(user)
     return DialogState.filter
 
 
@@ -279,13 +316,11 @@ restart_handler = QueryHandler(
     restart, 'Рестарт')
 
 filter_by_sex_include_handler = QueryHandler(
-    # QueryPattern([Or('include'), OrMulti([And('exclude'), And('except')])], 'SexArgument'),
     QueryPattern([], 'SexArgument'),
     filter_by_sex_include, 'Фильтр по полу "включить"')
 
 filter_by_sex_exclude_handler = QueryHandler(
     QueryPattern([Or('exclude'), AndNot('except')], 'SexArgument'),
-    # QueryPattern([Or('exclude')], 'SexArgument'),
     filter_by_sex_exclude, 'Фильтр по полу "исключить"')
 
 filter_by_age_range_handler = QueryHandler(
@@ -294,11 +329,11 @@ filter_by_age_range_handler = QueryHandler(
 
 filter_by_age_include_handler = QueryHandler(
     QueryPattern([AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
-    filter_by_age_include, 'Фильтр по возрасту')
+    filter_by_age_include, 'Фильтр по возрасту "включить"')
 
 filter_by_age_exclude_handler = QueryHandler(
     QueryPattern([And('exclude'), AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
-    filter_by_age_exclude, 'Фильтр по возрасту')
+    filter_by_age_exclude, 'Фильтр по возрасту "исключить"')
 
 set_output_len_handler = QueryHandler(
     QueryPattern([Or('show'), OrMulti([And('po'), AndMulti([Or('result'), Or('artist')])])], 'NumArgument'),

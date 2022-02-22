@@ -1,6 +1,7 @@
 from typing import List, Dict
 from lab8.src.const import SexFilter, GroupTypeFilter
 
+ALL = 1000
 
 class User:
     _name: str
@@ -22,19 +23,22 @@ class User:
         self._older_filter = None
         self._sex_filter = SexFilter.any
         self.search_result = []
-        self.output_len = 1000
+        self.output_len = ALL
 
     @property
     def str_filters(self):
         res = ''
         if self.group_type_filter != GroupTypeFilter.any:
-            res += f'по количеству исполнителей: {self.group_type_filter.value} '
+            res += f'по количеству исполнителей {self.group_type_filter.value} | '
         if self.sex_filter != SexFilter.any:
-            res += f'по полу: {self.sex_filter.value} '
+            res += f'по полу {self.sex_filter.value} | '
         if self._older_filter:
-            res += f'старше: {self._older_filter}'
+            res += f'старше {self._older_filter} | '
         if self._younger_filter:
-            res += f'моложе: {self._younger_filter}'
+            res += f'моложе {self._younger_filter} | '
+        if self.output_len != ALL:
+            res += f'максимальная длина вывода {self.output_len}'
+        if len(res) > 2 and res[-2] == '|': res = res[:-2]
         return res
 
     @property
@@ -52,6 +56,10 @@ class User:
     @property
     def group_type_filter(self) -> GroupTypeFilter:
         return self._group_type_filter
+
+    @group_type_filter.setter
+    def group_type_filter(self, filter_: GroupTypeFilter):
+        self._group_type_filter = filter_
 
     @property
     def younger_filter(self) -> int | None:
@@ -73,8 +81,12 @@ class User:
     def sex_filter(self) -> SexFilter | None:
         return self._sex_filter
 
-    def add_group_type_filter(self, filter_: GroupTypeFilter):
-        self._group_type_filter = filter_
+    def set_all_filters_to_default(self):
+        self._group_type_filter = GroupTypeFilter.any
+        self._younger_filter = None
+        self._older_filter = None
+        self._sex_filter = SexFilter.any
+        self.output_len = ALL
 
     def add_sex_filter(self, sex: SexFilter):
         self._sex_filter = sex

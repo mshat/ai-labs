@@ -19,12 +19,13 @@ class SentenceParser:
             raise SentenceParsingError('Empty input')
         self._raw_sentence = sentence
         self._sentence = sentence
-        # self._clear_sentence()
+        self._clear_sentence()
         self._is_question = self._check_is_it_question()
         self._sentence = self._sentence.replace('?', '')
 
     def _clear_sentence(self):
-        pass
+        self._sentence = self._sentence.replace(',', '')
+        self._sentence = self._sentence.replace('  ', ' ')
 
     def _check_is_it_question(self):
         if self._sentence[-1] == '?':

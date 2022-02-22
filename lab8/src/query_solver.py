@@ -26,10 +26,10 @@ class QuerySolver:
         if DEBUG:
             print(f'[UNRECOGNIZED SENTENCE] {query.arguments} {query.keywords} {query.words}')
 
-    def match_patterns(self, handlers_: List[QueryHandler], query: Query) -> str | None:
+    def match_patterns(self, handlers_: List[QueryHandler], query: Query, show=True) -> str | None:
         for handler in handlers_:
             if handler.match_pattern(query):
-                self.state = handler.handle(query, self._user)
+                self.state = handler.handle(query, self._user, show)
                 handler.remove_used_keywords_and_args(query)
                 return handler.handle.__name__
 
@@ -61,8 +61,7 @@ class QuerySolver:
             self.state = search_handler.handle(query, self._user)
             search_handler.remove_used_keywords_and_args(query)
             used_filter = self.solve_multi_filters(query)
-            if used_filter is None:
-                handlers.show_recommendations(self._user)
+            handlers.show_recommendations(self._user)
             return search_handler.handle.__name__
 
         search_handlers = [
@@ -81,10 +80,10 @@ class QuerySolver:
         ]
         return self.match_patterns(info_handlers, query)
 
-    def match_filter_patterns(self, query: Query) -> str | None:
+    def match_filter_patterns(self, query: Query, show=True) -> str | None:
         filter_handlers = [
-            handlers.filter_by_sex_include_handler,
             handlers.filter_by_sex_exclude_handler,
+            handlers.filter_by_sex_include_handler,
             handlers.filter_by_age_range_handler,
             handlers.filter_by_age_exclude_handler,
             handlers.filter_by_age_include_handler,
@@ -93,12 +92,12 @@ class QuerySolver:
             handlers.remove_filters_handler,
             handlers.remove_result_len_filter_handler,
         ]
-        return self.match_patterns(filter_handlers, query)
+        return self.match_patterns(filter_handlers, query, show=show)
 
     def solve_multi_filters(self, query: Query):
         last_res = None
         while True:
-            res = self.match_filter_patterns(query)
+            res = self.match_filter_patterns(query, show=False)
             if res is None:
                 break
             else:

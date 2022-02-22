@@ -49,10 +49,10 @@ class DataForTests:
         "все исполнители": 'show_all_artists',
     }
     test_filter = {
-        # "оставь исполнителей мужского пола": 'filter_by_sex_include',
-        # "оставь женщин": 'filter_by_sex_include',
-        # "убери женщин": 'filter_by_sex_exclude',
-        # "выбери женщин": 'filter_by_sex_include',
+        "оставь исполнителей мужского пола": 'filter_by_sex_include',
+        "оставь женщин": 'filter_by_sex_include',
+        "убери женщин": 'filter_by_sex_exclude',
+        "выбери женщин": 'filter_by_sex_include',
         "убери всех исполнителей кроме женского пола": 'filter_by_sex_include',
         "убери всех кроме женского пола": 'filter_by_sex_include',
         "оставь только соло исполнителей": 'filter_by_members_count',
