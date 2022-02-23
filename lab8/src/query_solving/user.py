@@ -3,6 +3,7 @@ from lab8.src.data.const import SexFilter, GroupTypeFilter
 
 ALL = 1000
 
+
 class User:
     _name: str
     _likes: List[str]
@@ -11,7 +12,6 @@ class User:
     _younger_filter: int | None
     _older_filter: int | None
     _sex_filter: SexFilter
-    search_result: List
     output_len: int
 
     def __init__(self, name: str = None):
@@ -22,7 +22,6 @@ class User:
         self._younger_filter = None
         self._older_filter = None
         self._sex_filter = SexFilter.any
-        self.search_result = []
         self.output_len = ALL
 
     @property

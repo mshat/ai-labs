@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Tuple
 from lab8.src.query_handling import handlers
 from lab8.src.sentence_analyzer.query import Query
-from lab8.src.query_solving.dialog_state import DialogState
+from lab8.src.query_solving.dialog import Dialog, DialogState
 from lab8.src.config import DEBUG
 from lab8.src.query_handling.query_handler import QueryHandler
 from lab8.src.query_solving.user import User
@@ -9,36 +9,40 @@ import lab8.src.query_handling.handling_functions as handling_functions
 
 
 class QuerySolver:
+    dialog: Dialog
+
     def __init__(self, user: User):
-        self._state = DialogState.start
+        self.dialog = Dialog()
         self._user = user
-        self.response = None
 
     @property
     def state(self):
-        return self._state
+        return self.dialog.state
 
     @state.setter
     def state(self, val):
-        self._state = val
+        self.dialog.state = val
+        if val == DialogState.start:
+            self.dialog.search_result = []
 
     def unknown(self, query: Query):
         print('Я не понял вопрос')
         if DEBUG:
             print(f'[UNRECOGNIZED SENTENCE] {query.arguments} {query.keywords} {query.words}')
 
-    def match_patterns(self, handlers_: List[QueryHandler], query: Query, show=True) -> str | None:
+    def match_patterns(self, handlers_: List[QueryHandler], query: Query, show=True) -> Tuple[DialogState, str | None]:
         for handler in handlers_:
             if handler.match_pattern(query):
-                self.state = handler.handle(query, self._user, show)
+                next_state = handler.handle(query, self._user, self.dialog, show)
                 handler.remove_used_keywords_and_args(query)
-                return handler.handle.__name__
+                return next_state, handler.handle.__name__
+        return self.state, None
 
-    def match_restart_patterns(self, query: Query):
+    def match_restart_patterns(self, query: Query) -> Tuple[DialogState, str | None]:
         restart_handler = handlers.restart_handler
         return self.match_patterns([restart_handler], query)
 
-    def match_like_dislike_patterns(self, query: Query):
+    def match_like_dislike_patterns(self, query: Query) -> Tuple[DialogState, str | None]:
         like_dislike_handlers = [
             handlers.exclude_dislike_handler,
             handlers.exclude_like_handler,
@@ -47,7 +51,7 @@ class QuerySolver:
         ]
         return self.match_patterns(like_dislike_handlers, query)
 
-    def match_number_query_patterns(self, query: Query):
+    def match_number_query_patterns(self, query: Query) -> Tuple[DialogState, str | None]:
         number_query_handlers = [
             handlers.number_with_sex_handler,
             handlers.number_with_age_range_handler,
@@ -56,14 +60,14 @@ class QuerySolver:
         ]
         return self.match_patterns(number_query_handlers, query)
 
-    def match_search_patterns(self, query: Query):
+    def match_search_patterns(self, query: Query) -> Tuple[DialogState, str | None]:
         search_handler = handlers.search_by_artist_handler
         if search_handler.match_pattern(query):
-            self.state = search_handler.handle(query, self._user)
+            next_state = search_handler.handle(query, self._user, self.dialog)
             search_handler.remove_used_keywords_and_args(query)
-            used_filter = self.solve_multi_filters(query)
-            handling_functions.show_recommendations(self._user)
-            return search_handler.handle.__name__
+            self.solve_multi_filters(query)
+            handling_functions.show_recommendations(self._user, self.dialog)
+            return next_state, search_handler.handle.__name__
 
         search_handlers = [
             handlers.recommendation_handler,
@@ -75,7 +79,7 @@ class QuerySolver:
         ]
         return self.match_patterns(search_handlers, query)
 
-    def match_info_patterns(self, query: Query):
+    def match_info_patterns(self, query: Query) -> Tuple[DialogState, str | None]:
         info_handlers = [
             handlers.info_handler,
             handlers.info_about_bot_algorithm_handler,
@@ -84,7 +88,7 @@ class QuerySolver:
         ]
         return self.match_patterns(info_handlers, query)
 
-    def match_filter_patterns(self, query: Query, show=True) -> str | None:
+    def match_filter_patterns(self, query: Query, show=True) -> Tuple[DialogState, str | None]:
         filter_handlers = [
             handlers.filter_by_sex_exclude_handler,
             handlers.filter_by_sex_include_handler,
@@ -98,47 +102,55 @@ class QuerySolver:
         ]
         return self.match_patterns(filter_handlers, query, show=show)
 
-    def solve_multi_filters(self, query: Query):
-        last_res = None
+    def solve_multi_filters(self, query: Query) -> None:
         while True:
-            res = self.match_filter_patterns(query, show=False)
-            if res is None:
+            next_state, debug_res = self.match_filter_patterns(query, show=False)
+            if debug_res is None:
                 break
-            else:
-                last_res = res
-
-        return last_res
 
     def solve(self, query: Query):
         # restart
-        res = self.match_restart_patterns(query)
-        if res: return res
-
-        # set output len
-        res = self.match_patterns([handlers.set_output_len_handler], query)
-        if res: return res
+        next_state, debug_res = self.match_restart_patterns(query)
+        if debug_res:
+            self.state = next_state
+            return debug_res
 
         # filters
-        if self.state in (DialogState.search, DialogState.filter, DialogState.count_filter):
-            res = self.match_filter_patterns(query)
-            if res:
-                return res
+        if self.state in (DialogState.search, DialogState.filter):
+            next_state, debug_res = self.match_filter_patterns(query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
             else:
                 self.state = DialogState.start
 
         # like/dislike, number query, search, info
         if self.state in (DialogState.start, DialogState.number, DialogState.like, DialogState.dislike, DialogState.info):
-            res = self.match_like_dislike_patterns(query)
-            if res: return res
+            next_state, debug_res = self.match_like_dislike_patterns(query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
 
-            res = self.match_number_query_patterns(query)
-            if res: return res
+            next_state, debug_res = self.match_number_query_patterns(query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
 
-            res = self.match_search_patterns(query)
-            if res: return res
+            next_state, debug_res = self.match_search_patterns(query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
 
-            res = self.match_info_patterns(query)
-            if res: return res
+            # set output len
+            next_state, debug_res = self.match_patterns([handlers.set_output_len_handler], query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
+
+            next_state, debug_res = self.match_info_patterns(query)
+            if debug_res:
+                self.state = next_state
+                return debug_res
 
         self.unknown(query)
 

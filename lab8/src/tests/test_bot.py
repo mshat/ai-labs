@@ -1,5 +1,6 @@
 import unittest
-from lab8.src.query_solving.query_solver import QuerySolver, DialogState
+from lab8.src.query_solving.dialog import Dialog, DialogState
+from lab8.src.query_solving.query_solver import QuerySolver
 from lab8.src.sentence_analyzer.sentence_parser import SentenceParser
 from lab8.src.query_solving.user import User
 
@@ -125,6 +126,7 @@ class DataForTests:
 class TestIntegrationStates(unittest.TestCase):
     def setUp(self) -> None:
         self.user = User()
+        self.dialog = Dialog()
         
     def check_next_states(self, state, allowed_sentences: dict, disallowed_sentences: dict):
         query_solver = QuerySolver(self.user)
