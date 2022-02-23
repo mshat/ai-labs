@@ -1,17 +1,13 @@
 from typing import List
-from lab8.src.query_handler import Query, QueryPattern, QueryHandler
-from lab8.src.tag_condition import (AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti,
-                                    AndTagCondition as And, OrTagCondition as Or, AndNotTagCondition as AndNot,
-                                    OrNotTagCondition as OrNot)
-from lab8.src.dialog_state import DialogState
-from lab8.src.query_handler import log_query_pattern_strings, ALL
-from lab8.src.tools import debug_print
-from lab8.src.query import ArtistArgument, NumArgument, SexArgument, GenreArgument
-from lab8.src.user import User
+from lab8.src.query_handling.query_handler import Query
+from lab8.src.query_solver.dialog_state import DialogState
+from lab8.src.tools.debug_print import debug_print
+from lab8.src.sentence_analyzer.argument import ArtistArgument, NumArgument, SexArgument, GenreArgument
+from lab8.src.query_solver.user import User
 from lab8.src.recommender_system import filter
 from lab8.src.recommender_system import interface
 from lab8.src.config import DEBUG
-from lab8.src.const import SexFilter, GroupTypeFilter
+from lab8.src.data.const import SexFilter, GroupTypeFilter
 
 
 def filter_search_result(user: User):
@@ -26,10 +22,10 @@ def filter_search_result(user: User):
 
 
 def show_recommendations(user: User):
-    if user.str_filters != '':
-        print(f'Установлены фильтры: {user.str_filters}')
     if user.dislikes:
         print(f'Список дизлайков: {", ".join(user.dislikes)}')
+    if user.str_filters != '':
+        print(f'Установлены фильтры: {user.str_filters}')
     filtered = filter_search_result(user)
     if filtered:
         artists = filtered
@@ -75,6 +71,17 @@ def search_by_artist(query: Query, user: User, show=True):
     artist = get_arguments_by_type(query, 'ArtistArgument')[0]
     artists = interface.recommend_by_seed(artist.value, disliked_artists=user.dislikes)
     user.search_result = artists
+    return DialogState.search
+
+
+def recommendation(query: Query, user: User, show=True):
+    if len(user.likes) == 0:
+        print('Для начала расскажите, какие музыканты или группы вам нравятся?')
+        return DialogState.start
+    user.search_result = interface.recommend_by_liked_with_disliked(user.dislikes, user.likes, DEBUG)
+
+    print(f'Список лайков: {", ".join(user.likes)}')
+    show_recommendations(user)
     return DialogState.search
 
 
@@ -311,117 +318,72 @@ def remove_filters(query: Query, user: User, show=True):
     return DialogState.filter
 
 
-restart_handler = QueryHandler(
-    QueryPattern([And('restart')]),
-    restart, 'Рестарт')
-
-filter_by_sex_include_handler = QueryHandler(
-    QueryPattern([], 'SexArgument'),
-    filter_by_sex_include, 'Фильтр по полу "включить"')
-
-filter_by_sex_exclude_handler = QueryHandler(
-    QueryPattern([Or('exclude'), AndNot('except')], 'SexArgument'),
-    filter_by_sex_exclude, 'Фильтр по полу "исключить"')
-
-filter_by_age_range_handler = QueryHandler(
-    QueryPattern([Or('range'), OrMulti([And('older'), And('younger')])], required_arguments={'NumArgument': 2}),
-    filter_by_age_range, 'Фильтр по возрасту в диапазоне')
-
-filter_by_age_include_handler = QueryHandler(
-    QueryPattern([AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
-    filter_by_age_include, 'Фильтр по возрасту "включить"')
-
-filter_by_age_exclude_handler = QueryHandler(
-    QueryPattern([And('exclude'), AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
-    filter_by_age_exclude, 'Фильтр по возрасту "исключить"')
-
-set_output_len_handler = QueryHandler(
-    QueryPattern([Or('show'), OrMulti([And('po'), AndMulti([Or('result'), Or('artist')])])], 'NumArgument'),
-    set_output_len, 'Изменить количество выводимых результатов')
-
-filter_by_members_count_handler = QueryHandler(
-    QueryPattern([Or('group'), Or('solo'), Or('duet')]),
-    filter_by_members_count, 'Фильтр по количеству участников коллектива')
-
-remove_filters_handler = QueryHandler(
-    QueryPattern([And('exclude'), And('all'), And('filter')]),
-    remove_filters, 'Удалить все фильтры')
-
-remove_result_len_filter_handler = QueryHandler(
-    QueryPattern([
-        OrMulti([And('exclude'), And('number')]),
-        OrMulti([AndMulti([Or('show'), Or('include')]), And('all')])
-    ]),
-    remove_result_len_filter, 'Удалить ограничение количества выводимых строк')
-
-exclude_dislike_handler = QueryHandler(
-    QueryPattern([And('dislike'), And('exclude')], required_arguments={'ArtistArgument': ALL}),
-    like, 'Лайк')
-
-exclude_like_handler = QueryHandler(
-    QueryPattern([And('like'), And('exclude')], required_arguments={'ArtistArgument': ALL}),
-    dislike, 'Дизлайк')
-
-like_handler = QueryHandler(
-    QueryPattern([And('like')], required_arguments={'ArtistArgument': ALL}),
-    like, 'Лайк')
-
-dislike_handler = QueryHandler(
-    QueryPattern([And('dislike')], required_arguments={'ArtistArgument': ALL}),
-    dislike, 'Дизлайк')
-
-number_with_sex_handler = QueryHandler(
-    QueryPattern([Or('number'), Or('how many')], 'SexArgument'),
-    number_with_sex, 'Количество артистов указанного пола в базе')
-
-number_with_age_range_handler = QueryHandler(
-    QueryPattern(
-        [AndMulti([Or('number'), Or('how many')]), AndMulti([Or('range'), OrMulti([And('older'), And('younger')])])],
-        required_arguments={'NumArgument': 2}
-    ),
-    number_with_age_range, 'Количество артистов от X до Y лет в базе')
-
-number_with_age_handler = QueryHandler(
-    QueryPattern(
-        [AndMulti([Or('number'), Or('how many')]), AndMulti([Or('older'), Or('younger')])],
-        'NumArgument'
-    ),
-    number_with_age, 'Количество артистов указанного возраста в базе')
-
-number_handler = QueryHandler(
-    QueryPattern([Or('number'), Or('how many')]),
-    number, 'Количество артистов в базе')
-
-search_by_sex_handler = QueryHandler(
-    QueryPattern([Or('artist'), Or('recommend'), Or('show')], 'SexArgument'),
-    search_by_sex, 'Вывести исполнителей указанного пола')
-
-search_by_age_range_handler = QueryHandler(
-    QueryPattern(
-        [AndMulti([Or('artist'), Or('recommend'), Or('show')]), AndMulti([Or('range'), OrMulti([And('older'), And('younger')])])],
-        required_arguments={'NumArgument': 2}),
-    search_by_age_range, 'Вывести исполнителей в диапазоне возраста')
-
-search_by_age_handler = QueryHandler(
-    QueryPattern([AndMulti([Or('artist'), Or('recommend'), Or('show')]), AndMulti([Or('older'), Or('younger')])], 'NumArgument'),
-    search_by_age, 'Вывести исполнителей в указанном возрасте')
-
-search_by_genre_handler = QueryHandler(
-    QueryPattern([Or('genre'), Or('recommend'), Or('show')], 'GenreArgument'),
-    search_by_genre, 'Вывести артистов в определённом жанре')
-
-search_by_artist_handler = QueryHandler(
-    QueryPattern([Or('search'), Or('recommend'), Or('show')], 'ArtistArgument'),
-    search_by_artist, 'Рекомендация по артисту')
-
-show_all_handler = QueryHandler(
-    QueryPattern([And('all'), AndMulti([Or('include'), Or('artist'), Or('show')])]),
-    show_all_artists, 'Вывести всех артистов в базе')
-
-info_handler = QueryHandler(
-    QueryPattern([Or('talk about'), Or('about'), Or('info')], 'ArtistArgument'),
-    info, 'Информация об артисте')
+def about_bot(query: Query, user: User, show=True):
+    debug_print('Информация о боте')
+    print('Я - ваш помощник в мире русского хипхопа. Меня сделал Шатохин Максим, ИУ7-12М')
+    return DialogState.info
 
 
-if __name__ == "__main__":
-    log_query_pattern_strings()
+def about_opportunities(query: Query, user: User, show=True):
+    debug_print('Возможности бота')
+    print("""Я могу выполнять следующие действия:
+1. Рекомендация по артисту                       
+2. Рекомендация по интересам                     
+3. Вывести всех артистов в базе                  
+4. Вывести всех исполнителей указанного пола          
+5. Вывести всех исполнителей в указанном возрасте     
+7. Вывести всех исполнителей в диапазоне возраста     
+8. Вывести всех артистов в определённом жанре         
+9. Поставить лайк (можно несколько сразу)                                          
+10. Поставить дизлайк (можно несколько сразу)                                                                       
+11. Фильтр по полу                                     
+12. Фильтр по возрасту                           
+13. Фильтр по возрасту в диапазоне                
+14. Фильтр по количеству участников коллектива    
+15. Фильтр по количеству выводимых результатов    
+16. Удалить ограничение количества выводимых строк
+17. Удалить все фильтры                           
+18. Изменить количество выводимых результатов     
+19. Вывести количество артистов в базе                    
+20. Вывести количество артистов указанного пола в базе    
+21. Вывести количество артистов указанного возраста в базе
+22. Вывести количество артистов в указанном диапазоне возраста    
+23. Вывести информацию об артисте                         
+24. Вывести информацию о боте                             
+25. Вывести информацию о возможностях бота                
+26. Вывести информацию об устройстве бота                 
+27. Вернуться к начальному состоянию  
+"""
+    )
+    return DialogState.info
+
+
+def about_algorithm(query: Query, user: User, show=True):
+    debug_print('Алгоритм бота')
+    print("""Я работаю следующим образом:
+Вначале, когда я получаю от вас текстовое сообщение, я удаляю из него лишние пробелы и запятые.
+Затем в полученном предложении происходит поиск аргументов. Я имею словари аргументов, таких как
+имена музыкантов, названия жанров и пол людей. В первую очередь я извлекаю из текста именно их.
+Затем я отбираю из оставшихся слов числа. Аргументы помещаются в специальный словарь для дальнейшего их
+использования в обработчиках.
+
+На втором этапе я привожу все оставшиеся в предложении слова к нормальной форме и присваиваю им теги.
+Я имею словарь тегов разных категорий, где ключами являются название категории, а значениями списки 
+синонимов этого ключевого слова. Если анализируемое слово входит в какой-то список синонимов, ему 
+присваеется соответствующий тэг.
+
+Также я имею список шаблонов запросов. Каждый шаблон может иметь список необходимых для запроса аргументов 
+(и их количество) и условия наличия или отсутствия во фразе ключевых слов. Далее я примеряю к полученному 
+от вас запросу шаблоны. То есть проверяю, имеются ли в запросе необходимые аргументы в нужном количестве
+и выполняются ли указанные в шаблоне условия наличия или отсутствия ключевых слов.
+В случае, если один из шаблонов подходит, я вызываю привязанный к нему обработчик.
+
+Диалог имеет несколько состояний, в зависимости от которых проверяются те или иные шаблоны фраз.
+
+Отдельно можно сказать о запросе рекомендации артистов, похожих на указанного. В данном сценарии вы 
+можете указывать и сам запрос, и фильтры к нему в одном предложении.
+
+Список шаблонов с условиями вы можете увидеть в файле query_pattern_strings.txt. Он генерируется автоматически при 
+запуске handlers.py.
+""")
+    return DialogState.info

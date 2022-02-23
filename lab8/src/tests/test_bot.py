@@ -1,7 +1,7 @@
 import unittest
-from lab8.src.query_solver import QuerySolver, DialogState
-from lab8.src.parsers import SentenceParser
-from lab8.src.user import User
+from lab8.src.query_solver.query_solver import QuerySolver, DialogState
+from lab8.src.sentence_analyzer.sentence_parser import SentenceParser
+from lab8.src.query_solver.user import User
 
 
 class DataForTests:
@@ -107,6 +107,18 @@ class DataForTests:
         'информация про кизару': 'info',
         'информация о касте': 'info',
         'хочу узнать о многоточии': 'info',
+        'кто ты?': 'about_bot',
+        'что ты?': 'about_bot',
+        'что ты за программа?': 'about_bot',
+        'что ты можешь?': 'about_opportunities',
+        'что ты умеешь?': 'about_opportunities',
+        'какие у тебя есть функции?': 'about_opportunities',
+        'перечисли свои функции?': 'about_opportunities',
+        'расскажи про свой алгоритм': 'about_algorithm',
+        'какой твой алгоритм?': 'about_algorithm',
+        'как ты устроен?': 'about_algorithm',
+        'каково твоё устройство?': 'about_algorithm',
+        'как ты работаешь?': 'about_algorithm',
     }
 
 

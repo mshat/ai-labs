@@ -1,8 +1,8 @@
 from __future__ import annotations
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import List, Dict, Tuple
-from lab8.src.data import keywords
-from lab8.src.query import Word
+from lab8.src.data.data import keywords
+from lab8.src.sentence_analyzer.word import Word
 
 
 class PatternMatcher:  # TODO как-то вынести в отдельный модуль, разрешив циклический импорт
@@ -133,7 +133,7 @@ class MultiTagCondition(ABC):
     Результатом вызова метода solve будет результат вычисления условий self.conditions
     """
 
-    def __init__(self, conditions: List[AndTagCondition | OrTagCondition]):
+    def __init__(self, conditions: List[AndTagCondition | OrTagCondition | AndNotTagCondition | OrNotTagCondition]):
         self.pattern_matcher = PatternMatcher(conditions)
         self.conditions = conditions
 

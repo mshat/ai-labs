@@ -1,11 +1,10 @@
 import re
-from typing import List, Dict, ClassVar, Union
-from lab8.src.morph_nalyzer import MorphAnalyzer
-from lab8.src.word import BaseWord, Placeholder, Word
-from lab8.src.query import (ArtistArgumentError, GenreArgumentError, ArgumentError, Argument, ArtistArgument, SexArgument,
-                   GenreArgument, StrArgument, NumArgument, ARTISTS, GENRES, Query)
-from lab8.src.word_classifier import WORD_CLASSIFIER
-from lab8.src.data import GENDERS
+from typing import List, Dict, Union
+from lab8.src.sentence_analyzer.word import BaseWord, Placeholder, Word
+from lab8.src.sentence_analyzer.query import Query
+from lab8.src.sentence_analyzer.argument import ArtistArgument, SexArgument, GenreArgument, NumArgument, ARTISTS, GENRES
+from lab8.src.data.data import GENDERS
+from lab8.src.sentence_analyzer.word_parser import WordParser
 
 PLACEHOLDERS = {'artist': '*ARTISTNAME*', 'genre': '*GENRENAME*', 'gender': '*GENDER*', 'number': '*NUMBER*'}
 
@@ -85,25 +84,4 @@ class SentenceParser:
             words=parsed_words,
             arguments=arguments,
             is_question=self._is_question
-        )
-
-
-class WordParsingError(Exception): pass
-
-
-class WordParser:
-    _tag: str
-
-    def __init__(self, word: str):
-        if word == '':
-            raise WordParsingError('Empty input')
-        self._word = word
-
-    def parse(self, dialog_state) -> Word:
-        parsed_word = MorphAnalyzer.parse(self._word)[0]  # TODO не обязательно первый вариант правильный
-        return Word(
-            word=self._word,
-            normal_word=parsed_word.normal_form,
-            morph_speech_part=parsed_word.tag.POS,
-            tag=WORD_CLASSIFIER.assign_tags(parsed_word.normal_form, dialog_state),
         )

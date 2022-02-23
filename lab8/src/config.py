@@ -1,3 +1,7 @@
-DEBUG = True
+DEBUG = False
 DEBUG_PRINT = True
 SHOW_QUERY_PATTERNS = False
+
+if not DEBUG:
+    DEBUG_PRINT = False
+    SHOW_QUERY_PATTERNS = False

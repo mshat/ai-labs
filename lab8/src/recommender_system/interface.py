@@ -71,9 +71,8 @@ def recommend_by_seed(seed_artist: str, disliked_artists: [str], debug=False):
     return recommendations
 
 
-def recommend_by_liked(liked_artist_names: str):
-    liked_artist_names_list = split_artists(liked_artist_names)
-    liked_artists = {find_artist(artist.lower()) for artist in liked_artist_names_list}
+def recommend_by_liked(liked_artist_names: List[str] = None):
+    liked_artists = {find_artist(artist.lower()) for artist in liked_artist_names}
 
     artist_recommendations = OrderedDict()
     for artist in liked_artists:
@@ -91,7 +90,7 @@ def recommend_by_liked(liked_artist_names: str):
             if len(recommendations) > i:
                 name = recommendations[i][0]
                 proximity = recommendations[i][1]
-                if name not in final_recommendations and name not in liked_artist_names_list:
+                if name not in final_recommendations and name not in liked_artist_names:
                     final_recommendations[name] = proximity
 
     final_recommendation_artists = list(final_recommendations.keys())
@@ -100,10 +99,12 @@ def recommend_by_liked(liked_artist_names: str):
     return final_dict
 
 
-def recommend_by_liked_with_disliked(disliked_artists: str, liked_artist_names: str, debug=False):
-    recommendations_by_liked = recommend_by_liked(liked_artist_names)
-    disliked_artists = split_artists(disliked_artists)
-    for dislike in disliked_artists:
+def recommend_by_liked_with_disliked(
+        disliked_artists_list: List[str] = None,
+        liked_artists_list: List[str] = None,
+        debug=False):
+    recommendations_by_liked = recommend_by_liked(liked_artists_list)
+    for dislike in disliked_artists_list:
         if dislike in recommendations_by_liked:
             recommendations_by_liked.pop(dislike)
             if debug:

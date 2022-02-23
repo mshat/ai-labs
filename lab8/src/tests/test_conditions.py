@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import Mock
-from lab8.src.tag_condition import (AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition, TagCondition,
-                           MultiTagCondition, PatternMatcher)
+from lab8.src.query_handling.tag_condition import (AndMultiTagCondition, AndTagCondition, OrTagCondition, PatternMatcher)
 
 
 class TestTagSimpleCondition(unittest.TestCase):

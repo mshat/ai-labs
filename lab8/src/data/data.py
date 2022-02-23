@@ -1,11 +1,12 @@
-# ARTISTS = ['лигалайз', 'многоточие', 'krec', 'guf', 'баста', 'каста', 'ак-47', 'каспийский груз', 'кровосток', 'the chemodan', 'смоки мо', 'рем дигга', 'миша маваши', 'd-man 55', 'грот', 'oxxxymiron', 'соня мармеладова', 'alyona alyona', 'sid', 'redo', 'ram', 'полумягкие', 'оу74', 'паша техник', 'овсянкин', 'pharaoh', 'boulevard depo', 'mnogoznaal', 'kizaru', 'лсп', 'atl', 'макс корж', 'slava marlow', 'скриптонит', 'noize mc', 'loqiemean', 'anacondaz', '25/17', 'lizer', 'джизус', 'мукка', 'lizer', 'face', 'gone.fludd', 'big baby tape', 'элджей', 'morgenshtern', 'rakhim', 'егор крид', 'тимати', 'pyrokinesis', 't-fest', 'miyagi', 'jah khalib', 'hammali & navai']
-# GENRES = ['freestyle', 'regular', 'emo', 'raprock', 'cloud', 'club', 'drill', 'electronicvocal', 'grime', 'mumble', 'phonk', 'hardcore', 'horrorcore', 'underground', 'hookah', 'pop', 'gangsta', 'workout', 'classic', 'soft']
-from lab8.src.const import SexFilter
+from lab8.src.data.const import SexFilter
 
 keywords = {
-    'search': ('найти', 'похожий', 'схожий', 'как',),
+    'search': ('найти', 'похожий', 'схожий',),
+    'like/how': ('как', 'каков', 'какой',),
     'artist': ('артист', 'исполнитель', 'музыкант', 'рэпер', 'певец'),
     'result': ('результат',),
+    'line': ('строка', 'сточка',),
+    'restrict': ('ограничить', 'ограничение',),
     'po': ('по',),
     'genre': ('жанр', 'стиль',),
 
@@ -26,18 +27,25 @@ keywords = {
     'age': ('возраст',),
 
     'talk about': ('рассказать',),
-    'info': ('информация', 'узнать'),  # мб добавить "про|об" артиста и тд
+    'info': ('информация', 'узнать'),
 
-    'like': ('нравиться', 'лайк', 'любить', 'любимый', 'лайковый',),
+    'like': ('нравиться', 'лайк', 'любить', 'любимый', 'лайковый', 'понравиться', 'интерес', 'интересно', 'лайкам'),
 
     'dislike': ('не нравиться', 'дизлайк', 'не любить', 'нелюбимый', 'дизлайковый',),
+
+    'to me': ('я', 'мой'),
 
     'how many': ('сколько',),
     'number': ('количество',),
 
     'restart': ('вернуться', 'начало', 'новый', 'начать', 'заново'),
 
-    'filter': ('фильтр', 'ограничение',)
+    'filter': ('фильтр',),
+
+    'you': ('ты', 'свой', 'твой'),
+    'who': ('кто', 'что',),
+    'opportunities': ('функция', 'функционал', 'возможность', 'мочь', 'уметь'),
+    'algorithm': ('алгоритм', 'работать', 'устройство', 'устроенный'),
 }
 
 # for tag1, aliases1 in keywords.items():

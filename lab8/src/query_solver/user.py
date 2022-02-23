@@ -1,5 +1,5 @@
-from typing import List, Dict
-from lab8.src.const import SexFilter, GroupTypeFilter
+from typing import List
+from lab8.src.data.const import SexFilter, GroupTypeFilter
 
 ALL = 1000
 

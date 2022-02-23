@@ -1,10 +1,11 @@
-from typing import Tuple, List
-from lab8.src import handlers
-from lab8.src.query import Query
-from lab8.src.dialog_state import DialogState
+from typing import List
+from lab8.src.query_handling import handlers
+from lab8.src.sentence_analyzer.query import Query
+from lab8.src.query_solver.dialog_state import DialogState
 from lab8.src.config import DEBUG
-from lab8.src.query_handler import QueryHandler
-from lab8.src.user import User
+from lab8.src.query_handling.query_handler import QueryHandler
+from lab8.src.query_solver.user import User
+import lab8.src.query_handling.handling_functions as handling_functions
 
 
 class QuerySolver:
@@ -61,11 +62,11 @@ class QuerySolver:
             self.state = search_handler.handle(query, self._user)
             search_handler.remove_used_keywords_and_args(query)
             used_filter = self.solve_multi_filters(query)
-            handlers.show_recommendations(self._user)
+            handling_functions.show_recommendations(self._user)
             return search_handler.handle.__name__
 
         search_handlers = [
-            handlers.search_by_artist_handler,
+            handlers.recommendation_handler,
             handlers.search_by_sex_handler,
             handlers.search_by_age_range_handler,
             handlers.search_by_age_handler,
@@ -77,6 +78,9 @@ class QuerySolver:
     def match_info_patterns(self, query: Query):
         info_handlers = [
             handlers.info_handler,
+            handlers.info_about_bot_algorithm_handler,
+            handlers.info_about_bot_handler,
+            handlers.info_about_bot_opportunities_handler,
         ]
         return self.match_patterns(info_handlers, query)
 
@@ -88,7 +92,7 @@ class QuerySolver:
             handlers.filter_by_age_exclude_handler,
             handlers.filter_by_age_include_handler,
             handlers.filter_by_members_count_handler,
-            handlers.set_output_len_handler,
+            handlers.filter_output_len_handler,
             handlers.remove_filters_handler,
             handlers.remove_result_len_filter_handler,
         ]
@@ -106,23 +110,24 @@ class QuerySolver:
         return last_res
 
     def solve(self, query: Query):
+        # restart
         res = self.match_restart_patterns(query)
         if res: return res
 
-        if self.state.value in (DialogState.search.value, DialogState.filter.value, DialogState.count_filter.value):
+        # set output len
+        res = self.match_patterns([handlers.set_output_len_handler], query)
+        if res: return res
+
+        # filters
+        if self.state in (DialogState.search, DialogState.filter, DialogState.count_filter):
             res = self.match_filter_patterns(query)
             if res:
                 return res
             else:
                 self.state = DialogState.start
 
-        if self.state.value in (
-                DialogState.start.value,
-                DialogState.number.value,
-                DialogState.like.value,
-                DialogState.dislike.value,
-                DialogState.info.value
-        ):
+        # like/dislike, number query, search, info
+        if self.state in (DialogState.start, DialogState.number, DialogState.like, DialogState.dislike, DialogState.info):
             res = self.match_like_dislike_patterns(query)
             if res: return res
 
