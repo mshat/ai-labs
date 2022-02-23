@@ -1,10 +1,10 @@
 from typing import List
 from lab8.src.query_handling import handlers
 from lab8.src.sentence_analyzer.query import Query
-from lab8.src.query_solver.dialog_state import DialogState
+from lab8.src.query_solving.dialog_state import DialogState
 from lab8.src.config import DEBUG
 from lab8.src.query_handling.query_handler import QueryHandler
-from lab8.src.query_solver.user import User
+from lab8.src.query_solving.user import User
 import lab8.src.query_handling.handling_functions as handling_functions
 
 

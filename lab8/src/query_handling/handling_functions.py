@@ -1,9 +1,9 @@
 from typing import List
 from lab8.src.query_handling.query_handler import Query
-from lab8.src.query_solver.dialog_state import DialogState
+from lab8.src.query_solving.dialog_state import DialogState
 from lab8.src.tools.debug_print import debug_print
 from lab8.src.sentence_analyzer.argument import ArtistArgument, NumArgument, SexArgument, GenreArgument
-from lab8.src.query_solver.user import User
+from lab8.src.query_solving.user import User
 from lab8.src.recommender_system import filter
 from lab8.src.recommender_system import interface
 from lab8.src.config import DEBUG
