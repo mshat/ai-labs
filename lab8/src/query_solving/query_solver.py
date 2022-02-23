@@ -77,7 +77,8 @@ class QuerySolver:
             handlers.search_by_age_range_handler,
             handlers.search_by_age_handler,
             handlers.search_by_genre_handler,
-            handlers.show_all_handler,
+            handlers.show_all_artists_handler,
+            handlers.show_all_genres_handler,
         ]
         return self.match_patterns(search_handlers, query)
 

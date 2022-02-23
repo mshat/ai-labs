@@ -9,7 +9,6 @@ keywords = {
     'restrict': ('ограничить', 'ограничение',),
     'po': ('по',),
     'genre': ('жанр', 'стиль',),
-
     'about': ('о', 'про'),
     'except': ('кроме', 'исключая'),
     'recommend': ('посоветовать', 'порекомендовать', 'рекомендация'),
@@ -48,11 +47,11 @@ keywords = {
     'algorithm': ('алгоритм', 'работать', 'устройство', 'устроенный'),
 }
 
-# for tag1, aliases1 in keywords.items():
-#     for tag2, aliases2 in keywords.items():
-#         if tag1 != tag2:
-#             if set(aliases1) & set(aliases2):
-#                 print(tag1, tag2, set(aliases1) & set(aliases2))
+for tag1, aliases1 in keywords.items():
+    for tag2, aliases2 in keywords.items():
+        if tag1 != tag2:
+            if set(aliases1) & set(aliases2):
+                print(tag1, tag2, set(aliases1) & set(aliases2))
 
 GENDERS = {
     'мужcкой': SexFilter.male,

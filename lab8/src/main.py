@@ -3,6 +3,7 @@ from src.query_solving.query_solver import QuerySolver
 from src.query_solving.user import User
 from src.query_solving.dialog import DialogState
 from src.config import DEBUG
+from src.data.const import LINE_LEN
 
 
 def test(sentences: [str]):
@@ -22,15 +23,21 @@ def main():
     user = User()
     query_solver = QuerySolver(user)
 
-    print('Вас приветствует бот-помощник по миру русского хипхопа.\n'
-          'Вы можете узнать о моих возможностях, спросив меня об этом')
+    print(f'{"="*LINE_LEN}\n'
+          'Вас приветствует разговорный бот.\n'
+          'Я кое-что знаю о русском хип-хопе и готов ответить на ваши вопросы по этой теме.\n'
+          'Вы можете узнать о моих возможностях, спросив меня об этом.\n'
+          f'{"=" * LINE_LEN}'
+          )
     while True:
         if query_solver.state in (DialogState.search, DialogState.filter):
             input_prompt = 'ФИЛЬТР -> '
         else:
             input_prompt = 'ЗАПРОС -> '
         sentence = input(input_prompt)
-        if sentence == '': continue
+        if sentence == '':
+            print('Вы что-то хотели?..')
+            continue
         query = SentenceParser(sentence).parse(query_solver.state)
         query_solver.solve(query)
         if DEBUG: print('[CURRENT STATE]', query_solver.state)

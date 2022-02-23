@@ -1,12 +1,12 @@
 import os
-from typing import List
+from typing import List, Iterable
 from collections import OrderedDict
 from src.recommender_system.recommendation_list import get_recommendations
 from src.recommender_system.recommendation_list import (
     Node, create_tree_from_json, load_artist_pairs_proximity_json, calc_max_general_proximity,
     calc_min_general_proximity, normalize_proximities)
 from src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes, get_leafs_values
-from src.recommender_system.tree.genre_node import GenreVisualNode
+from src.recommender_system.tree.genre_node import GenreVisualNode, VisualNode
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 TREE = create_tree_from_json(f'{dir_path}/data/genres.json')
@@ -41,6 +41,14 @@ def print_artists(artists: List[GenreVisualNode], max_output_len=None, debug=Fal
                 print(artist.name, artist.genre)
             else:
                 print(artist.name)
+
+
+def print_strings(strings: Iterable[str], max_output_len=None):
+    if max_output_len is None:
+        max_output_len = 100000
+    for i, item in enumerate(strings):
+        if i < max_output_len:
+            print(item)
 
 
 def find_artist(name: str) -> GenreVisualNode:

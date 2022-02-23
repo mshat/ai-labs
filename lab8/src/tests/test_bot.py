@@ -47,7 +47,11 @@ class DataForTests:
         "все артисты": 'show_all_artists',
         "все рэперы": 'show_all_artists',
         "все певцы": 'show_all_artists',
+        "каких артистов ты знаешь?": 'show_all_artists',
         "все исполнители": 'show_all_artists',
+        "покажи все жанры": 'show_all_genres',
+        "все жанры": 'show_all_genres',
+        "какие жанры ты знаешь?": 'show_all_genres',
     }
     test_filter = {
         "оставь исполнителей мужского пола": 'filter_by_sex_include',

@@ -1,5 +1,6 @@
 import enum
 
+LINE_LEN = 120
 
 class SexFilter(enum.Enum):
     any = 'anysex'

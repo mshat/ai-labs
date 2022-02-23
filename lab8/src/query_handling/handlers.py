@@ -122,9 +122,13 @@ recommendation_handler = QueryHandler(
     QueryPattern([AndMulti([Or('search'), Or('recommend'), Or('show'), Or('artist')]), AndMulti([Or('to me'), Or('like')])]),
     functions.recommendation, 'Рекомендация по интересам')
 
-show_all_handler = QueryHandler(
-    QueryPattern([And('all'), AndMulti([Or('include'), Or('artist'), Or('show')])]),
+show_all_artists_handler = QueryHandler(
+    QueryPattern([AndMulti([Or('all'), Or('like/how')]), AndNot('genre'), AndMulti([Or('include'), Or('artist'), Or('show')])]),
     functions.show_all_artists, 'Вывести всех артистов в базе')
+
+show_all_genres_handler = QueryHandler(
+    QueryPattern([AndMulti([Or('all'), Or('like/how')]), AndMulti([Or('include'), Or('genre'), Or('show')])]),
+    functions.show_all_genres, 'Вывести все жанры в базе')
 
 info_handler = QueryHandler(
     QueryPattern([Or('talk about'), Or('about'), Or('info')], 'ArtistArgument'),

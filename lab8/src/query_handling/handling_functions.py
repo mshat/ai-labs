@@ -7,13 +7,17 @@ from src.query_solving.user import User
 from src.recommender_system import filter
 from src.recommender_system import interface
 from src.config import DEBUG, ENABLE_FILTERS
-from src.data.const import SexFilter, GroupTypeFilter
+from src.data.const import SexFilter, GroupTypeFilter, LINE_LEN
+from src.data.data import GENRES
 
 
 def print_after_search_message():
     if ENABLE_FILTERS:
-        print('Вы находитесь в режиме ФИЛЬТРАЦИИ. Вы можете добавить фильтры к полученному результату поиска.\n'
-              'Чтобы задать новый вопрос, скажите мне начать сначала')
+        print(f'{"="*LINE_LEN}\n'
+              f'Вы находитесь в режиме ФИЛЬТРАЦИИ. Вы можете добавить фильтры к полученному результату поиска.\n'
+              'Чтобы задать новый вопрос, скажите мне начать сначала\n'
+              f'{"=" * LINE_LEN}'
+              )
 
 
 def filter_search_result(user: User, dialog: Dialog):
@@ -77,7 +81,16 @@ def show_all_artists(query: Query, user: User, dialog: Dialog, show=True):
     artists = interface.get_all_artists()
     interface.print_artists(artists)
     print_after_search_message()
+    print('Кстати, в запросах вы можете указывать имя артиста или группы на русском языке, даже если тут он '
+          'записан на английском')
     return DialogState.search
+
+
+def show_all_genres(query: Query, user: User, dialog: Dialog, show=True):
+    genres = set(GENRES.values())
+    interface.print_strings(genres)
+    print('Кстати, в фильтрах вы можете указывать название жанра на русском языке')
+    return DialogState.start
 
 
 def search_by_artist(query: Query, user: User, dialog: Dialog, show=True):
@@ -348,9 +361,10 @@ def about_opportunities(query: Query, user: User, dialog: Dialog, show=True):
 
 1. Рекомендация по артисту                       
 2. Рекомендация по интересам                     
-3. Вывести всех артистов в базе                  
-4. Вывести всех исполнителей указанного пола          
-5. Вывести всех исполнителей в указанном возрасте     
+3. Вывести всех артистов в базе
+4. Вывести все известные боту жанры                  
+5. Вывести всех исполнителей указанного пола          
+6. Вывести всех исполнителей в указанном возрасте     
 7. Вывести всех исполнителей в диапазоне возраста     
 8. Вывести всех артистов в определённом жанре         
 9. Поставить лайк (можно несколько сразу)                                          
@@ -371,8 +385,7 @@ def about_opportunities(query: Query, user: User, dialog: Dialog, show=True):
 24. Вывести информацию о боте                             
 25. Вывести информацию о возможностях бота                
 26. Вывести информацию об устройстве бота                 
-27. Вернуться к начальному состоянию  
-"""
+27. Вернуться к начальному состоянию"""
     )
     return DialogState.info
 
