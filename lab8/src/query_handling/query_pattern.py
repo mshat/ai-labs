@@ -1,8 +1,8 @@
 from typing import List, Tuple, Dict
-from lab8.src.sentence_analyzer.word import Word
-from lab8.src.sentence_analyzer.argument import Argument
-from lab8.src.sentence_analyzer.query import Query
-from lab8.src.query_handling.tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
+from src.sentence_analyzer.word import Word
+from src.sentence_analyzer.argument import Argument
+from src.sentence_analyzer.query import Query
+from src.query_handling.tag_condition import PatternMatcher, AndMultiTagCondition, OrMultiTagCondition, AndTagCondition, OrTagCondition
 
 ALL = -1
 

@@ -1,4 +1,4 @@
-from lab8.src.data.data import keywords as raw_keywords
+from src.data.data import keywords as raw_keywords
 
 KEYWORDS = raw_keywords
 

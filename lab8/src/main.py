@@ -1,8 +1,8 @@
-from lab8.src.sentence_analyzer.sentence_parser import SentenceParser
-from lab8.src.query_solving.query_solver import QuerySolver
-from lab8.src.query_solving.user import User
-from lab8.src.query_solving.dialog import DialogState
-from lab8.src.config import DEBUG
+from src.sentence_analyzer.sentence_parser import SentenceParser
+from src.query_solving.query_solver import QuerySolver
+from src.query_solving.user import User
+from src.query_solving.dialog import DialogState
+from src.config import DEBUG
 
 
 def test(sentences: [str]):

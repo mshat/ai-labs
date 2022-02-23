@@ -1,11 +1,11 @@
 from typing import List, Tuple
-from lab8.src.query_handling import handlers
-from lab8.src.sentence_analyzer.query import Query
-from lab8.src.query_solving.dialog import Dialog, DialogState
-from lab8.src.config import DEBUG
-from lab8.src.query_handling.query_handler import QueryHandler
-from lab8.src.query_solving.user import User
-import lab8.src.query_handling.handling_functions as handling_functions
+from src.query_handling import handlers
+from src.sentence_analyzer.query import Query
+from src.query_solving.dialog import Dialog, DialogState
+from src.config import DEBUG
+from src.query_handling.query_handler import QueryHandler
+from src.query_solving.user import User
+import src.query_handling.handling_functions as handling_functions
 
 
 class QuerySolver:

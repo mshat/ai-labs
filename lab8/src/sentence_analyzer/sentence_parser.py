@@ -1,10 +1,10 @@
 import re
 from typing import List, Dict, Union
-from lab8.src.sentence_analyzer.word import BaseWord, Placeholder, Word
-from lab8.src.sentence_analyzer.query import Query
-from lab8.src.sentence_analyzer.argument import ArtistArgument, SexArgument, GenreArgument, NumArgument, ARTISTS, GENRES
-from lab8.src.data.data import GENDERS
-from lab8.src.sentence_analyzer.word_parser import WordParser
+from src.sentence_analyzer.word import BaseWord, Placeholder, Word
+from src.sentence_analyzer.query import Query
+from src.sentence_analyzer.argument import ArtistArgument, SexArgument, GenreArgument, NumArgument, ARTISTS, GENRES
+from src.data.data import GENDERS
+from src.sentence_analyzer.word_parser import WordParser
 
 PLACEHOLDERS = {'artist': '*ARTISTNAME*', 'genre': '*GENRENAME*', 'gender': '*GENDER*', 'number': '*NUMBER*'}
 

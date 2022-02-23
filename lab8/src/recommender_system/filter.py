@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from lab8.src.recommender_system.interface import find_artist
+from src.recommender_system.interface import find_artist
 
 EXCLUDE = ['sex', 'group_type', 'older', 'younger']
 

@@ -1,8 +1,8 @@
 from __future__ import annotations
 from abc import ABC
 from typing import List, Dict, Tuple
-from lab8.src.data.data import keywords
-from lab8.src.sentence_analyzer.word import Word
+from src.data.data import keywords
+from src.sentence_analyzer.word import Word
 
 
 class PatternMatcher:  # TODO как-то вынести в отдельный модуль, разрешив циклический импорт

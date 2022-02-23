@@ -1,6 +1,6 @@
 from typing import List
-from lab8.src.sentence_analyzer.keywords import KEYWORDS
-from lab8.src.query_solving.query_solver import DialogState
+from src.sentence_analyzer.keywords import KEYWORDS
+from src.query_solving.query_solver import DialogState
 
 
 class WordClassifier:

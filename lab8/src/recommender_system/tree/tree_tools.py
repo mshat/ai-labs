@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../..")
-from lab8.src.recommender_system.tree.node import Node
-from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
+from src.recommender_system.tree.node import Node
+from src.recommender_system.tree.genre_node import GenreVisualNode
 
 
 def find_path_to_node(root: Node, path: list, node_name: str):

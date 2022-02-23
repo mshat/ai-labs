@@ -1,8 +1,8 @@
-from lab8.src.recommender_system.pow_distance import calc_distance_in_pow
-from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
-from lab8.src.recommender_system.tree.node import Node
-from lab8.src.recommender_system.tree.tree_tools import calc_distance_between_nodes, get_leafs_values, calc_max_distance_between_nodes_optimized
-from lab8.src.recommender_system.tree.tree_tools import calc_distance_between_all_nodes
+from src.recommender_system.pow_distance import calc_distance_in_pow
+from src.recommender_system.tree.genre_node import GenreVisualNode
+from src.recommender_system.tree.node import Node
+from src.recommender_system.tree.tree_tools import calc_distance_between_nodes, get_leafs_values, calc_max_distance_between_nodes_optimized
+from src.recommender_system.tree.tree_tools import calc_distance_between_all_nodes
 
 
 def calc_euclidean_measure(leaf_1: GenreVisualNode, leaf_2: GenreVisualNode):

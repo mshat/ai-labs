@@ -1,4 +1,4 @@
-from lab8.src.data.const import SexFilter
+from src.data.const import SexFilter
 
 keywords = {
     'search': ('найти', 'похожий', 'схожий',),

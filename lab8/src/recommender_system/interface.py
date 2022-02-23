@@ -1,12 +1,12 @@
 import os
 from typing import List
 from collections import OrderedDict
-from lab8.src.recommender_system.recommendation_list import get_recommendations
-from lab8.src.recommender_system.recommendation_list import (
+from src.recommender_system.recommendation_list import get_recommendations
+from src.recommender_system.recommendation_list import (
     Node, create_tree_from_json, load_artist_pairs_proximity_json, calc_max_general_proximity,
     calc_min_general_proximity, normalize_proximities)
-from lab8.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes, get_leafs_values
-from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
+from src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes, get_leafs_values
+from src.recommender_system.tree.genre_node import GenreVisualNode
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 TREE = create_tree_from_json(f'{dir_path}/data/genres.json')

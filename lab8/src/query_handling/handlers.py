@@ -1,9 +1,9 @@
-from lab8.src.query_handling.query_handler import QueryPattern, QueryHandler
-from lab8.src.query_handling.tag_condition import (AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti,
+from src.query_handling.query_handler import QueryPattern, QueryHandler
+from src.query_handling.tag_condition import (AndMultiTagCondition as AndMulti, OrMultiTagCondition as OrMulti,
                                                    AndTagCondition as And, OrTagCondition as Or, AndNotTagCondition as AndNot)
-from lab8.src.query_handling.query_handler import log_query_pattern_strings
-from lab8.src.query_handling.query_pattern import ALL
-import lab8.src.query_handling.handling_functions as functions
+from src.query_handling.query_handler import log_query_pattern_strings
+from src.query_handling.query_pattern import ALL
+import src.query_handling.handling_functions as functions
 
 
 restart_handler = QueryHandler(

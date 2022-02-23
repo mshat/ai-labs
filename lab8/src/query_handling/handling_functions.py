@@ -1,13 +1,13 @@
 from typing import List
-from lab8.src.query_handling.query_handler import Query
-from lab8.src.query_solving.dialog import Dialog, DialogState
-from lab8.src.tools.debug_print import debug_print
-from lab8.src.sentence_analyzer.argument import ArtistArgument, NumArgument, SexArgument, GenreArgument
-from lab8.src.query_solving.user import User
-from lab8.src.recommender_system import filter
-from lab8.src.recommender_system import interface
-from lab8.src.config import DEBUG
-from lab8.src.data.const import SexFilter, GroupTypeFilter
+from src.query_handling.query_handler import Query
+from src.query_solving.dialog import Dialog, DialogState
+from src.tools.debug_print import debug_print
+from src.sentence_analyzer.argument import ArtistArgument, NumArgument, SexArgument, GenreArgument
+from src.query_solving.user import User
+from src.recommender_system import filter
+from src.recommender_system import interface
+from src.config import DEBUG
+from src.data.const import SexFilter, GroupTypeFilter
 
 
 def print_after_search_message():

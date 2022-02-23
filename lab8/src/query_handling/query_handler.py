@@ -1,7 +1,7 @@
 from typing import Callable
-from lab8.src.sentence_analyzer.query import Query
-from lab8.src.config import SHOW_QUERY_PATTERNS, DEBUG
-from lab8.src.query_handling.query_pattern import QueryPattern
+from src.sentence_analyzer.query import Query
+from src.config import SHOW_QUERY_PATTERNS, DEBUG
+from src.query_handling.query_pattern import QueryPattern
 
 QUERY_PATTERN_STRINGS = []
 

@@ -1,18 +1,18 @@
 import os
 import json
 from collections import OrderedDict
-from lab8.src.recommender_system.tree.visual_node import Node
-from lab8.src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes
-from lab8.src.recommender_system.tree.tree_loader import create_tree_from_json
-from lab8.src.recommender_system.tree.genre_node import GenreVisualNode
-from lab8.src.recommender_system.proximity_measures import (
+from src.recommender_system.tree.visual_node import Node
+from src.recommender_system.tree.tree_tools import calc_max_distance_between_nodes
+from src.recommender_system.tree.tree_loader import create_tree_from_json
+from src.recommender_system.tree.genre_node import GenreVisualNode
+from src.recommender_system.proximity_measures import (
     calc_generalizing_proximity_measure_for_all_leafs,
     calc_max_general_proximity,
     calc_min_general_proximity,
     normalize_proximities
 )
-from lab8.src.recommender_system.tools import format_print
-from lab8.src.recommender_system.config import MIN_SIMILARITY_PROXIMITY
+from src.recommender_system.tools import format_print
+from src.recommender_system.config import MIN_SIMILARITY_PROXIMITY
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 

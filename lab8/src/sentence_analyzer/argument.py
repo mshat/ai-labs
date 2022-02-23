@@ -1,4 +1,4 @@
-from lab8.src.data.data import ARTISTS, GENRES, GENDERS
+from src.data.data import ARTISTS, GENRES, GENDERS
 
 
 class ArgumentError(Exception): pass

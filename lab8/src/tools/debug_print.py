@@ -1,4 +1,4 @@
-from lab8.src.config import DEBUG_PRINT
+from src.config import DEBUG_PRINT
 
 
 def debug_print(*args, **kwargs):

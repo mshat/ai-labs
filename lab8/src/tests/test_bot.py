@@ -1,8 +1,8 @@
 import unittest
-from lab8.src.query_solving.dialog import Dialog, DialogState
-from lab8.src.query_solving.query_solver import QuerySolver
-from lab8.src.sentence_analyzer.sentence_parser import SentenceParser
-from lab8.src.query_solving.user import User
+from src.query_solving.dialog import Dialog, DialogState
+from src.query_solving.query_solver import QuerySolver
+from src.sentence_analyzer.sentence_parser import SentenceParser
+from src.query_solving.user import User
 
 
 class DataForTests:

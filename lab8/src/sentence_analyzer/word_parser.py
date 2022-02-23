@@ -1,6 +1,6 @@
-from lab8.src.sentence_analyzer.morph_analyzer import MorphAnalyzer
-from lab8.src.sentence_analyzer.word import Word
-from lab8.src.sentence_analyzer.word_classifier import WORD_CLASSIFIER
+from src.sentence_analyzer.morph_analyzer import MorphAnalyzer
+from src.sentence_analyzer.word import Word
+from src.sentence_analyzer.word_classifier import WORD_CLASSIFIER
 
 
 class WordParsingError(Exception): pass

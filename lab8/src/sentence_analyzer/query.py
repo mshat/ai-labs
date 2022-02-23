@@ -1,6 +1,6 @@
 from typing import List
-from lab8.src.sentence_analyzer.word import Word, Placeholder
-from lab8.src.sentence_analyzer.argument import Argument
+from src.sentence_analyzer.word import Word, Placeholder
+from src.sentence_analyzer.argument import Argument
 
 
 class Query:
