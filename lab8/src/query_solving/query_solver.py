@@ -2,7 +2,7 @@ from typing import List, Tuple
 from src.query_handling import handlers
 from src.sentence_analyzer.query import Query
 from src.query_solving.dialog import Dialog, DialogState
-from src.config import DEBUG
+from src.config import DEBUG, ENABLE_FILTERS
 from src.query_handling.query_handler import QueryHandler
 from src.query_solving.user import User
 import src.query_handling.handling_functions as handling_functions
@@ -24,6 +24,8 @@ class QuerySolver:
         self.dialog.state = val
         if val == DialogState.start:
             self.dialog.search_result = []
+        if val in (DialogState.search, DialogState.filter) and not ENABLE_FILTERS:
+            self.dialog.state = DialogState.start
 
     def unknown(self, query: Query):
         print('Я не понял вопрос')

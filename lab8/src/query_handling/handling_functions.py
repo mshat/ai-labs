@@ -6,13 +6,14 @@ from src.sentence_analyzer.argument import ArtistArgument, NumArgument, SexArgum
 from src.query_solving.user import User
 from src.recommender_system import filter
 from src.recommender_system import interface
-from src.config import DEBUG
+from src.config import DEBUG, ENABLE_FILTERS
 from src.data.const import SexFilter, GroupTypeFilter
 
 
 def print_after_search_message():
-    print('Вы находитесь в режиме ФИЛЬТРАЦИИ. Вы можете добавить фильтры к полученному результату поиска.\n'
-          'Чтобы задать новый вопрос, скажите мне начать сначала')
+    if ENABLE_FILTERS:
+        print('Вы находитесь в режиме ФИЛЬТРАЦИИ. Вы можете добавить фильтры к полученному результату поиска.\n'
+              'Чтобы задать новый вопрос, скажите мне начать сначала')
 
 
 def filter_search_result(user: User, dialog: Dialog):
